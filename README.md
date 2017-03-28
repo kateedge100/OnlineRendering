@@ -1,2 +1,0 @@
-# OnlineRendering
-Online Rendering Assignment
