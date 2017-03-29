@@ -33,6 +33,7 @@ private:
     ShaderMethod m_shaderMethod = SHADER_GOURAUD;
 
     std::unique_ptr<ngl::Obj> m_mesh;
+    std::unique_ptr<ngl::Obj> m_meshMetal;
 };
 
 #endif // SHADERSCENE_H

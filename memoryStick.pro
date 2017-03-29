@@ -23,7 +23,11 @@ OTHER_FILES += ../common/shaders/gouraud_vert.glsl \
                ../common/shaders/gouraud_frag.glsl \
 	       shaders/phong_vert.glsl \
                shaders/phong_frag.glsl \
-               models/memoryStickSmall.obj
+               shaders/toon_vert.glsl \
+               shaders/toon_frag.glsl \
+               models/memoryStickPlastic.obj \
+               models/memoryStickMetal.obj
+
 
 
 

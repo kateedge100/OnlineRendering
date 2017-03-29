@@ -32,9 +32,13 @@ void ShaderScene::initGL() noexcept {
     shader->loadShader("ToonProgram","shaders/phong_vert.glsl","shaders/toon_frag.glsl");
 
     // Load the Obj file and create a Vertex Array Object
-    m_mesh.reset(new ngl::Obj("models/memoryStickSmall.obj"));
+    m_mesh.reset(new ngl::Obj("models/memoryStickPlastic.obj"));
     m_mesh->createVAO();
-    m_mesh->getCenter()+=ngl::Vec3(1,9,0);
+
+    // Load the Obj file and create a Vertex Array Object
+    m_meshMetal.reset(new ngl::Obj("models/memoryStickMetal.obj"));
+    m_meshMetal->createVAO();
+
 }
 
 void ShaderScene::paintGL() noexcept {
@@ -44,12 +48,12 @@ void ShaderScene::paintGL() noexcept {
     // Set up the viewport
     glViewport(0,0,m_width,m_height);
 
-    // Use our shader for this draw
-    ngl::ShaderLib *shader=ngl::ShaderLib::instance();
+    // Use plastic shader for this draw
+    ngl::ShaderLib *plasticShader=ngl::ShaderLib::instance();
     GLint pid;
 
-    (*shader)["PhongProgram"]->use();
-    pid = shader->getProgramID("PhongProgram");
+    (*plasticShader)["PhongProgram"]->use();
+    pid = plasticShader->getProgramID("PhongProgram");
 
 
     // Our MVP matrices
@@ -77,6 +81,32 @@ void ShaderScene::paintGL() noexcept {
                        glm::value_ptr(N)); // a raw pointer to the data
 
     m_mesh->draw();
+
+
+    // Use metal shader for this draw
+    ngl::ShaderLib *metalShader2=ngl::ShaderLib::instance();
+    GLint pid2;
+
+
+    (*metalShader2)["ToonProgram"]->use();
+    pid2 = metalShader2->getProgramID("ToonProgram");
+
+    // Set this MVP on the GPU
+    glUniformMatrix4fv(glGetUniformLocation(pid2, "MVP"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(MVP)); // a raw pointer to the data
+    glUniformMatrix4fv(glGetUniformLocation(pid2, "MV"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(MV)); // a raw pointer to the data
+    glUniformMatrix3fv(glGetUniformLocation(pid2, "N"), //location of uniform
+                       1, // how many matrices to transfer
+                       true, // whether to transpose matrix
+                       glm::value_ptr(N)); // a raw pointer to the data
+
+
+    m_meshMetal->draw();
 
 
 
