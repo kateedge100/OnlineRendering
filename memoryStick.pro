@@ -21,12 +21,16 @@ SOURCES += src/main.cpp \
 
 OTHER_FILES += ../common/shaders/gouraud_vert.glsl \
                ../common/shaders/gouraud_frag.glsl \
-	       shaders/phong_vert.glsl \
-               shaders/phong_frag.glsl \
-               shaders/toon_vert.glsl \
-               shaders/toon_frag.glsl \
+               shaders/plastic_vert.glsl \
+               shaders/plastic_frag.glsl \
+               shaders/metal_vert.glsl \
+               shaders/metal_frag.glsl \
+               shaders/bump_vert.glsl \
+               shaders/bump_frag.glsl \
                models/memoryStickPlastic.obj \
-               models/memoryStickMetal.obj
+               models/memoryStickMetal.obj \
+               models/memoryStickAdaptor.obj \
+               models/memoryStickFloor.obj
 
 
 

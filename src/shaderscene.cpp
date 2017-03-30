@@ -26,10 +26,10 @@ void ShaderScene::initGL() noexcept {
 
     // Create and compile all of our shaders
     ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-    shader->loadShader("GouraudProgram","../common/shaders/gouraud_vert.glsl","../common/shaders/gouraud_frag.glsl");
-    shader->loadShader("PhongProgram","shaders/phong_vert.glsl","shaders/phong_frag.glsl");
-    shader->loadShader("CookTorranceProgram","shaders/phong_vert.glsl","shaders/cooktorrance_frag.glsl");
-    shader->loadShader("ToonProgram","shaders/phong_vert.glsl","shaders/toon_frag.glsl");
+
+    shader->loadShader("PhongProgram","shaders/plastic_vert.glsl","shaders/plastic_frag.glsl");
+
+    shader->loadShader("ToonProgram","shaders/metal_vert.glsl","shaders/metal_frag.glsl");
 
     // Load the Obj file and create a Vertex Array Object
     m_mesh.reset(new ngl::Obj("models/memoryStickPlastic.obj"));
@@ -38,6 +38,14 @@ void ShaderScene::initGL() noexcept {
     // Load the Obj file and create a Vertex Array Object
     m_meshMetal.reset(new ngl::Obj("models/memoryStickMetal.obj"));
     m_meshMetal->createVAO();
+
+    // Load the Obj file and create a Vertex Array Object
+    m_meshAdaptor.reset(new ngl::Obj("models/memoryStickAdaptor.obj"));
+    m_meshAdaptor->createVAO();
+
+    // Load the Obj file and create a Vertex Array Object
+    m_meshFloor.reset(new ngl::Obj("models/memoryStickFloor.obj"));
+    m_meshFloor->createVAO();
 
 }
 
@@ -107,6 +115,9 @@ void ShaderScene::paintGL() noexcept {
 
 
     m_meshMetal->draw();
+    m_meshAdaptor->draw();
+    //m_meshFloor->draw();
+
 
 
 

@@ -46,7 +46,7 @@ uniform MaterialInfo Material = MaterialInfo(
 out vec4 FragColor;
 
 // colour of material
-vec4 materialColor= vec4(0.38f,0.07f,0.5686f,0.6f);
+vec4 materialColor= vec4(0.7f,0.7f,0.7f,1.0f);
 
 void main() {
     // Calculate the normal (this is the expensive bit in Phong)

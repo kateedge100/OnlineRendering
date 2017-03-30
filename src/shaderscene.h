@@ -34,6 +34,8 @@ private:
 
     std::unique_ptr<ngl::Obj> m_mesh;
     std::unique_ptr<ngl::Obj> m_meshMetal;
+    std::unique_ptr<ngl::Obj> m_meshAdaptor;
+    std::unique_ptr<ngl::Obj> m_meshFloor;
 };
 
 #endif // SHADERSCENE_H

@@ -57,34 +57,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 }
 
 /**
- * @brief key_callback Handle key press or release
- * @param window window handle (unused currently)
- * @param key The key that was pressed
- * @param action GLFW code for the action (GLFW_PRESS or GLFW_RELEASE)
- * @param mods Other keys which are currently being held down (e.g. GLFW_CTRL)
- */
-void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int mods)
-{
-    // Escape exits the application
-    if (action == GLFW_PRESS) {
-        switch(key) {
-        case (GLFW_KEY_ESCAPE):
-            glfwSetWindowShouldClose(window, true); break;
-        case (GLFW_KEY_1):
-            g_scene.setShaderMethod(ShaderScene::SHADER_GOURAUD); break;
-        case (GLFW_KEY_2):
-            g_scene.setShaderMethod(ShaderScene::SHADER_PHONG); break;
-        case (GLFW_KEY_3):
-            g_scene.setShaderMethod(ShaderScene::SHADER_COOKTORRANCE); break;
-        case (GLFW_KEY_4):
-            g_scene.setShaderMethod(ShaderScene::SHADER_TOON); break;
-        }
-    }
-    // Any other keypress should be handled by our camera
-    g_camera.handleKey(key, (action == GLFW_PRESS) );
-}
-
-/**
  * @brief resize_callback Handle a window resize event.
  * @param width New window width
  * @param height New window height
@@ -131,8 +103,7 @@ int main() {
     GLenum error = glGetError(); // quietly eat errors from glewInit()
 #endif
 
-    // Set keyboard callback
-    glfwSetKeyCallback(window, key_callback);
+
 
     // Disable the cursor for the FPS camera
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
