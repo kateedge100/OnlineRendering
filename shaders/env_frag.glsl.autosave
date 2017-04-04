@@ -47,7 +47,7 @@ void main () {
 
     vec3 r = reflect(v,n);
 
-    vec3 ref = refract(v,n,0.9);
+    vec3 ref = refract(v,n,0.5);
 
 
 

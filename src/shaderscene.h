@@ -9,13 +9,7 @@
 class ShaderScene : public Scene
 {
 public:
-    /// This enumerated type allows the user to flip between the shader methods
-    typedef enum {
-        SHADER_GOURAUD,
-        SHADER_PHONG,
-        SHADER_COOKTORRANCE,
-        SHADER_TOON
-    } ShaderMethod;
+
 
     ShaderScene();
 
@@ -25,14 +19,21 @@ public:
     /// Called when the scene is to be initialised
     void initGL() noexcept;
 
-    /// Allow the user to set the currently active shader method
-    void setShaderMethod(ShaderMethod method) {m_shaderMethod = method;}
+
 
 private:
-    /// Keep track of the currently active shader method
-    ShaderMethod m_shaderMethod = SHADER_GOURAUD;
 
-    std::unique_ptr<ngl::Obj> m_mesh;
+    GLuint m_envTex, m_glossMapTex;
+
+    void initEnvironment();
+
+    void initTexture(const GLuint&, GLuint &, const char *);
+
+    void initEnvironmentSide(GLenum /*target*/, const char* /*filename*/);
+
+
+
+    std::unique_ptr<ngl::Obj> m_meshPlastic;
     std::unique_ptr<ngl::Obj> m_meshMetal;
     std::unique_ptr<ngl::Obj> m_meshAdaptor;
     std::unique_ptr<ngl::Obj> m_meshFloor;

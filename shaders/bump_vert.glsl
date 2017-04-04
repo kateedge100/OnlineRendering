@@ -1,4 +1,7 @@
-#version 430
+#version 150                                       // Keeping you on the bleeding edge!
+#extension GL_EXT_gpu_shader4 : enable
+#extension GL_ARB_explicit_attrib_location : require
+#extension GL_ARB_explicit_uniform_location : require
 
 // The modelview and projection matrices are no longer given in OpenGL 4.2
 uniform mat4 MVP;

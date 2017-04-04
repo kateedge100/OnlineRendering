@@ -27,10 +27,13 @@ OTHER_FILES += ../common/shaders/gouraud_vert.glsl \
                shaders/metal_frag.glsl \
                shaders/bump_vert.glsl \
                shaders/bump_frag.glsl \
+               shaders/env_vert.glsl \
+               shaders/env_frag.glsl \
                models/memoryStickPlastic.obj \
                models/memoryStickMetal.obj \
                models/memoryStickAdaptor.obj \
-               models/memoryStickFloor.obj
+               models/memoryStickFloor.obj \
+               images/sky_zneg.png
 
 
 
