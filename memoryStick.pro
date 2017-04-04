@@ -33,7 +33,7 @@ OTHER_FILES += ../common/shaders/gouraud_vert.glsl \
                models/memoryStickMetal.obj \
                models/memoryStickAdaptor.obj \
                models/memoryStickFloor.obj \
-               images/sky_zneg.png
+               images/cubeX.png
 
 
 

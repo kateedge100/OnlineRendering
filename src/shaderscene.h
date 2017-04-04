@@ -23,7 +23,7 @@ public:
 
 private:
 
-    GLuint m_envTex, m_glossMapTex;
+    GLuint m_envTex, m_glossMapTex, m_normalTex;
 
     void initEnvironment();
 
