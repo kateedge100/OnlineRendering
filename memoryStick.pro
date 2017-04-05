@@ -19,9 +19,7 @@ SOURCES += src/main.cpp \
            ../common/src/trackballcamera.cpp \
            src/shaderscene.cpp
 
-OTHER_FILES += ../common/shaders/gouraud_vert.glsl \
-               ../common/shaders/gouraud_frag.glsl \
-               shaders/plastic_vert.glsl \
+OTHER_FILES += shaders/plastic_vert.glsl \
                shaders/plastic_frag.glsl \
                shaders/metal_vert.glsl \
                shaders/metal_frag.glsl \

@@ -35,20 +35,20 @@ void ShaderScene::initGL() noexcept {
 
     shader->loadShader("BumpProgram","shaders/bump_vert.glsl","shaders/bump_frag.glsl");
 
+    (*shader)["BumpProgram"]->use();
+
+
+    // use glossmap shader
+    shader->use("EnvironmentProgram");
+    shader->setUniform("glossMap", 1);
+
     // Initialise our environment map here
     initEnvironment();
 
     initTexture(0, m_normalTex, "images/normal.jpg");
 
     // Initialize gloss map
-    initTexture(1,m_glossMapTex,"images/gloss.png");
-
-    // use glossmap shader
-    shader->use("EnvironmentProgram");
-    shader->setUniform("glossMap", 1);
-
-    shader->use("BumpProgram");
-    shader->setUniform("bumpMap", 0);
+    initTexture(1,m_glossMapTex,"images/gloss.png");   
 
     // Set the active texture unit on the GPU
     GLint pid = shader->getProgramID("BumpProgram");
@@ -113,7 +113,7 @@ void ShaderScene::paintGL() noexcept {
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
 
-    m_meshPlastic->draw();
+    //m_meshPlastic->draw();
 
 
     // Use metal shader for this draw
@@ -192,6 +192,8 @@ void ShaderScene::paintGL() noexcept {
                        1, // how many matrices to transfer
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
+
+    m_meshPlastic->draw();
 
 
 
