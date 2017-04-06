@@ -45,7 +45,7 @@ void ShaderScene::initGL() noexcept {
     // Initialise our environment map here
     initEnvironment();
 
-    initTexture(0, m_normalTex, "images/normalMap.png");
+    initTexture(0, m_normalTex, "images/CoverNormalMap.png");
 
     // Initialize gloss map
     initTexture(1,m_glossMapTex,"images/gloss.png");   
@@ -113,7 +113,7 @@ void ShaderScene::paintGL() noexcept {
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
 
-    //m_meshPlastic->draw();
+    m_meshPlastic->draw();
 
 
     // Use metal shader for this draw
@@ -168,7 +168,7 @@ void ShaderScene::paintGL() noexcept {
                        false, // whether to transpose matrix
                        glm::value_ptr(glm::inverse(m_V))); // a raw pointer to the data
 
-    m_meshMetal->draw();
+    //m_meshMetal->draw();
 
     // Use our shader for this draw
     ngl::ShaderLib *bumpShader=ngl::ShaderLib::instance();
@@ -193,7 +193,7 @@ void ShaderScene::paintGL() noexcept {
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
 
-    m_meshPlastic->draw();
+    m_meshMetal->draw();
 
 
 
