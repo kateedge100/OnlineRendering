@@ -33,28 +33,38 @@ void ShaderScene::initGL() noexcept {
 
     shader->loadShader("EnvironmentProgram","shaders/env_vert.glsl","shaders/env_frag.glsl");
 
-    shader->loadShader("BumpProgram","shaders/bump_vert.glsl","shaders/bump_frag.glsl");
+    shader->loadShader("BumpProgramBody","shaders/bump_vert.glsl","shaders/bump_frag.glsl");
 
-    (*shader)["BumpProgram"]->use();
+    shader->loadShader("BumpProgramCover","shaders/bump_vert.glsl","shaders/bump_frag.glsl");
+
+    (*shader)["BumpProgramBody"]->use();
+
+    (*shader)["BumpProgramCover"]->use();
 
 
-    // use glossmap shader
-    shader->use("EnvironmentProgram");
-    shader->setUniform("glossMap", 1);
+//    // use glossmap shader
+//    shader->use("EnvironmentProgram");
+//    shader->setUniform("glossMap", 2);
 
-    // Initialise our environment map here
-    initEnvironment();
+//    // Initialise our environment map here
+//    initEnvironment();
 
-    initTexture(0, m_normalTex, "images/CoverNormalMap.png");
+    // Initialize Normal Map
+    initTexture(1, m_normalTexCover, "images/CoverNormalMap.png");
+    initTexture(0, m_normalTexBody, "images/normalMap.png");
 
     // Initialize gloss map
-    initTexture(1,m_glossMapTex,"images/gloss.png");   
+    //initTexture(2,m_glossMapTex,"images/gloss.png");
 
     // Set the active texture unit on the GPU
-    GLint pid = shader->getProgramID("BumpProgram");
+    GLint pid = shader->getProgramID("BumpProgramCover");
     glUniform1i(glGetUniformLocation(pid, "NormalTexture"), //location of uniform
                        0); // texture unit for normas
+    GLint pid2 = shader->getProgramID("BumpProgramBody");
+    glUniform1i(glGetUniformLocation(pid2, "NormalTexture"), //location of uniform
+                       1); // texture unit for normas
 
+    /// LOAD IN OBJECTS
 
     // Load the Obj file and create a Vertex Array Object
     m_meshPlastic.reset(new ngl::Obj("models/memoryStickPlastic.obj"));
@@ -113,7 +123,7 @@ void ShaderScene::paintGL() noexcept {
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
 
-    m_meshPlastic->draw();
+    //m_meshPlastic->draw();
 
 
     // Use metal shader for this draw
@@ -171,9 +181,9 @@ void ShaderScene::paintGL() noexcept {
     //m_meshMetal->draw();
 
     // Use our shader for this draw
-    ngl::ShaderLib *bumpShader=ngl::ShaderLib::instance();
-    (*bumpShader)["BumpProgram"]->use();
-    GLint pid4 = bumpShader->getProgramID("BumpProgram");
+    ngl::ShaderLib *bumpShaderCover=ngl::ShaderLib::instance();
+    (*bumpShaderCover)["BumpProgramCover"]->use();
+    GLint pid4 = bumpShaderCover->getProgramID("BumpProgramCover");
 
     // Set this MVP on the GPU
     glUniformMatrix4fv(glGetUniformLocation(pid4, "MVP"), //location of uniform
@@ -194,6 +204,31 @@ void ShaderScene::paintGL() noexcept {
                        glm::value_ptr(N)); // a raw pointer to the data
 
     m_meshMetal->draw();
+
+    // Use our shader for this draw
+    ngl::ShaderLib *bumpShaderBody=ngl::ShaderLib::instance();
+    (*bumpShaderBody)["BumpProgramBody"]->use();
+    GLint pid5 = bumpShaderBody->getProgramID("BumpProgramBody");
+
+    // Set this MVP on the GPU
+    glUniformMatrix4fv(glGetUniformLocation(pid5, "MVP"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(MVP)); // a raw pointer to the data
+    glUniformMatrix4fv(glGetUniformLocation(pid5, "MV"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(MV)); // a raw pointer to the data
+    glUniformMatrix3fv(glGetUniformLocation(pid5, "N"), //location of uniform
+                       1, // how many matrices to transfer
+                       true, // whether to transpose matrix
+                       glm::value_ptr(N)); // a raw pointer to the data
+    glUniformMatrix3fv(glGetUniformLocation(pid5, "N"), //location of uniform
+                       1, // how many matrices to transfer
+                       true, // whether to transpose matrix
+                       glm::value_ptr(N)); // a raw pointer to the data
+
+    m_meshPlastic->draw();
 
 
 
