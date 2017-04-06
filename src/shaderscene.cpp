@@ -45,7 +45,7 @@ void ShaderScene::initGL() noexcept {
     // Initialise our environment map here
     initEnvironment();
 
-    initTexture(0, m_normalTex, "images/normal.jpg");
+    initTexture(0, m_normalTex, "images/normalMap.png");
 
     // Initialize gloss map
     initTexture(1,m_glossMapTex,"images/gloss.png");   
