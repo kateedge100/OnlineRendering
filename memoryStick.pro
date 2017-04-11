@@ -3,7 +3,7 @@
 ######################################################################
 
 include(../common/common.pri)
-TARGET = phong
+TARGET = memoryStick
 
 # Input
 HEADERS += \

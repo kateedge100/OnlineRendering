@@ -78,7 +78,7 @@ vec3 rotateVector(vec3 src, vec3 tgt, vec3 vec) {
     return _norm.xyz / _norm.w;
 }
 
-void main() {  
+void main() {
     // Calculate the normal (this is the expensive bit in Phong)
     vec3 n = normalize( WSVertexNormal );
 
@@ -110,7 +110,8 @@ void main() {
 
     // Use the following shader for the correct value
     fragColour = vec4(texColor*lightColor,1.0);
-}  
+}
+
 
 
 

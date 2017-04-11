@@ -33,13 +33,9 @@ void ShaderScene::initGL() noexcept {
 
     shader->loadShader("EnvironmentProgram","shaders/env_vert.glsl","shaders/env_frag.glsl");
 
-    shader->loadShader("BumpProgramBody","shaders/bump_vert.glsl","shaders/bump_frag.glsl");
+    (*shader)["MetalProgram"]->use();
 
-    shader->loadShader("BumpProgramCover","shaders/bump_vert.glsl","shaders/bump_frag.glsl");
-
-    (*shader)["BumpProgramBody"]->use();
-
-    (*shader)["BumpProgramCover"]->use();
+    (*shader)["PlasticProgram"]->use();
 
 
 //    // use glossmap shader
@@ -50,17 +46,17 @@ void ShaderScene::initGL() noexcept {
 //    initEnvironment();
 
     // Initialize Normal Map
-    initTexture(1, m_normalTexCover, "images/CoverNormalMap.png");
-    initTexture(0, m_normalTexBody, "images/normalMap.png");
+    initTexture(0, m_normalTexCover, "images/CoverNormalMap.png");
+    initTexture(1, m_normalTexBody, "images/normalMap.png");
 
     // Initialize gloss map
     //initTexture(2,m_glossMapTex,"images/gloss.png");
 
     // Set the active texture unit on the GPU
-    GLint pid = shader->getProgramID("BumpProgramCover");
+    GLint pid = shader->getProgramID("MetalProgram");
     glUniform1i(glGetUniformLocation(pid, "NormalTexture"), //location of uniform
                        0); // texture unit for normas
-    GLint pid2 = shader->getProgramID("BumpProgramBody");
+    GLint pid2 = shader->getProgramID("PlasticProgram");
     glUniform1i(glGetUniformLocation(pid2, "NormalTexture"), //location of uniform
                        1); // texture unit for normas
 
@@ -123,14 +119,12 @@ void ShaderScene::paintGL() noexcept {
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
 
-    //m_meshPlastic->draw();
+    m_meshPlastic->draw();
 
 
     // Use metal shader for this draw
     ngl::ShaderLib *metalShader2=ngl::ShaderLib::instance();
     GLint pid2;
-
-
     (*metalShader2)["MetalProgram"]->use();
     pid2 = metalShader2->getProgramID("MetalProgram");
 
@@ -149,7 +143,7 @@ void ShaderScene::paintGL() noexcept {
                        glm::value_ptr(N)); // a raw pointer to the data
 
 
-    //m_meshMetal->draw();
+    m_meshMetal->draw();
     m_meshAdaptor->draw();
     //m_meshFloor->draw();
 
@@ -180,55 +174,55 @@ void ShaderScene::paintGL() noexcept {
 
     //m_meshMetal->draw();
 
-    // Use our shader for this draw
-    ngl::ShaderLib *bumpShaderCover=ngl::ShaderLib::instance();
-    (*bumpShaderCover)["BumpProgramCover"]->use();
-    GLint pid4 = bumpShaderCover->getProgramID("BumpProgramCover");
+//    // Use our shader for this draw
+//    ngl::ShaderLib *bumpShaderCover=ngl::ShaderLib::instance();
+//    (*bumpShaderCover)["BumpProgramCover"]->use();
+//    GLint pid4 = bumpShaderCover->getProgramID("BumpProgramCover");
 
-    // Set this MVP on the GPU
-    glUniformMatrix4fv(glGetUniformLocation(pid4, "MVP"), //location of uniform
-                       1, // how many matrices to transfer
-                       false, // whether to transpose matrix
-                       glm::value_ptr(MVP)); // a raw pointer to the data
-    glUniformMatrix4fv(glGetUniformLocation(pid4, "MV"), //location of uniform
-                       1, // how many matrices to transfer
-                       false, // whether to transpose matrix
-                       glm::value_ptr(MV)); // a raw pointer to the data
-    glUniformMatrix3fv(glGetUniformLocation(pid4, "N"), //location of uniform
-                       1, // how many matrices to transfer
-                       true, // whether to transpose matrix
-                       glm::value_ptr(N)); // a raw pointer to the data
-    glUniformMatrix3fv(glGetUniformLocation(pid4, "N"), //location of uniform
-                       1, // how many matrices to transfer
-                       true, // whether to transpose matrix
-                       glm::value_ptr(N)); // a raw pointer to the data
+//    // Set this MVP on the GPU
+//    glUniformMatrix4fv(glGetUniformLocation(pid4, "MVP"), //location of uniform
+//                       1, // how many matrices to transfer
+//                       false, // whether to transpose matrix
+//                       glm::value_ptr(MVP)); // a raw pointer to the data
+//    glUniformMatrix4fv(glGetUniformLocation(pid4, "MV"), //location of uniform
+//                       1, // how many matrices to transfer
+//                       false, // whether to transpose matrix
+//                       glm::value_ptr(MV)); // a raw pointer to the data
+//    glUniformMatrix3fv(glGetUniformLocation(pid4, "N"), //location of uniform
+//                       1, // how many matrices to transfer
+//                       true, // whether to transpose matrix
+//                       glm::value_ptr(N)); // a raw pointer to the data
+//    glUniformMatrix3fv(glGetUniformLocation(pid4, "N"), //location of uniform
+//                       1, // how many matrices to transfer
+//                       true, // whether to transpose matrix
+//                       glm::value_ptr(N)); // a raw pointer to the data
 
-    m_meshMetal->draw();
+//    //m_meshMetal->draw();
 
-    // Use our shader for this draw
-    ngl::ShaderLib *bumpShaderBody=ngl::ShaderLib::instance();
-    (*bumpShaderBody)["BumpProgramBody"]->use();
-    GLint pid5 = bumpShaderBody->getProgramID("BumpProgramBody");
+//    // Use our shader for this draw
+//    ngl::ShaderLib *bumpShaderBody=ngl::ShaderLib::instance();
+//    (*bumpShaderBody)["BumpProgramBody"]->use();
+//    GLint pid5 = bumpShaderBody->getProgramID("BumpProgramBody");
 
-    // Set this MVP on the GPU
-    glUniformMatrix4fv(glGetUniformLocation(pid5, "MVP"), //location of uniform
-                       1, // how many matrices to transfer
-                       false, // whether to transpose matrix
-                       glm::value_ptr(MVP)); // a raw pointer to the data
-    glUniformMatrix4fv(glGetUniformLocation(pid5, "MV"), //location of uniform
-                       1, // how many matrices to transfer
-                       false, // whether to transpose matrix
-                       glm::value_ptr(MV)); // a raw pointer to the data
-    glUniformMatrix3fv(glGetUniformLocation(pid5, "N"), //location of uniform
-                       1, // how many matrices to transfer
-                       true, // whether to transpose matrix
-                       glm::value_ptr(N)); // a raw pointer to the data
-    glUniformMatrix3fv(glGetUniformLocation(pid5, "N"), //location of uniform
-                       1, // how many matrices to transfer
-                       true, // whether to transpose matrix
-                       glm::value_ptr(N)); // a raw pointer to the data
+//    // Set this MVP on the GPU
+//    glUniformMatrix4fv(glGetUniformLocation(pid5, "MVP"), //location of uniform
+//                       1, // how many matrices to transfer
+//                       false, // whether to transpose matrix
+//                       glm::value_ptr(MVP)); // a raw pointer to the data
+//    glUniformMatrix4fv(glGetUniformLocation(pid5, "MV"), //location of uniform
+//                       1, // how many matrices to transfer
+//                       false, // whether to transpose matrix
+//                       glm::value_ptr(MV)); // a raw pointer to the data
+//    glUniformMatrix3fv(glGetUniformLocation(pid5, "N"), //location of uniform
+//                       1, // how many matrices to transfer
+//                       true, // whether to transpose matrix
+//                       glm::value_ptr(N)); // a raw pointer to the data
+//    glUniformMatrix3fv(glGetUniformLocation(pid5, "N"), //location of uniform
+//                       1, // how many matrices to transfer
+//                       true, // whether to transpose matrix
+//                       glm::value_ptr(N)); // a raw pointer to the data
 
-    m_meshPlastic->draw();
+//    //m_meshPlastic->draw();
 
 
 
