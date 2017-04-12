@@ -11,8 +11,26 @@ smooth in vec2 WSTexCoord;
 uniform sampler2D NormalTexture;
 uniform sampler2D ColourTexture;
 
+// A texture unit for storing the 3D texture
+uniform samplerCube envMap;
+
+// Set the maximum environment level of detail (cannot be queried from GLSL apparently)
+uniform int envMaxLOD = 8;
+
+// Set our gloss map texture
+uniform sampler2D glossMap;
+
+// The inverse View matrix
+uniform mat4 invV;
+
+// A toggle allowing you to set it to reflect or refract the light
+uniform bool isReflect = true;
+
+// Specify the refractive index for refractions
+uniform float refractiveIndex = 1.0;
+
 // The output colour which will be output to the framebuffer
-layout (location=0) out vec4 FragColour;
+layout (location=0) out vec4 FragColor;
 
 // Structure for holding light parameters
 struct LightInfo {
@@ -94,6 +112,14 @@ void main() {
     // Calculate the view vector
     vec3 v = normalize(vec3(-WSVertexPosition));
 
+    vec3 lookup;
+
+    if (isReflect) {
+        lookup = reflect(v,n);
+    } else {
+        lookup = refract(v,n,refractiveIndex);
+    }
+
     // Extract the normal from the normal map (rescale to [-1,1]
     vec3 tgt = normalize(texture(NormalTexture, WSTexCoord).rgb * 2.0 - 1.0);
 
@@ -115,9 +141,15 @@ void main() {
             Light.Ld * Material.Kd * max( dot(s, n), 0.0 ) +
             Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ));
 
+    // Determine the gloss value from our input texture, and scale it by our LOD resolution
+    float gloss = (1.0 - texture(glossMap, WSTexCoord*2).r) * float(envMaxLOD);
+
+    // This call determines the current LOD value for the texture map
+    vec4 colour = textureLod(envMap, lookup, gloss);
+
     vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
 
     // Set the output color of our current pixel
-   FragColour = vec4(lightColor, 1.0) * materialColor;
+   FragColor = vec4(lightColor, 1.0) * materialColor*colour;
 
 }

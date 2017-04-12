@@ -25,7 +25,7 @@ private:
 
     GLuint m_envTex, m_glossMapTex, m_normalTexBody, m_normalTexCover;
 
-    void initEnvironment();
+    void initEnvironment(std::string program);
 
     void initTexture(const GLuint&, GLuint &, const char *);
 

@@ -3,6 +3,7 @@
 #extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
 
+
 // The vertex position attribute
 layout (location=0) in vec3 VertexPosition;
 
