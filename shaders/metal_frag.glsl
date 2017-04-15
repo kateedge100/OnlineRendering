@@ -2,6 +2,7 @@
 #extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
 
+#define MAX_LIGHTS 2
 uniform sampler2D NormalTexture;
 uniform sampler2D ColourTexture;
 
@@ -26,7 +27,7 @@ uniform mat4 invV;
 uniform bool isReflect = true;
 
 // Specify the refractive index for refractions
-uniform float refractiveIndex = 1.0;
+uniform float refractiveIndex = 2.9304;
 // This is no longer a built-in variable
 layout (location=0) out vec4 FragColor;
 
@@ -40,11 +41,14 @@ struct LightInfo {
 
 // We'll have a single light in the scene with some default values
 uniform LightInfo Light = LightInfo(
-            vec4(2.0, 2.0, 10.0, 1.0),   // position
+            vec4(10.0,10.0, 10.0, 1.0),   // position
             vec3(0.2, 0.2, 0.2),        // La
             vec3(1.0, 1.0, 1.0),        // Ld
             vec3(1.0, 1.0, 1.0)         // Ls
             );
+
+
+
 
 // The material properties of our object
 struct MaterialInfo {
@@ -124,6 +128,7 @@ void main() {
 
     // Perturb the normal according to the target
     vec3 np = rotateVector(src, tgt, n);
+
 
     // Calculate the light vector
     vec3 s = normalize( vec3(Light.Position) - WSVertexPosition );

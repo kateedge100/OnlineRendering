@@ -24,10 +24,11 @@ uniform sampler2D glossMap;
 uniform mat4 invV;
 
 // A toggle allowing you to set it to reflect or refract the light
-uniform bool isReflect = true;
+uniform bool isReflect = false;
 
+// Refractic index quiried from https://refractiveindex.info/?shelf=3d&book=plastics&page=pmma
 // Specify the refractive index for refractions
-uniform float refractiveIndex = 1.0;
+uniform float refractiveIndex = 1.4906;
 
 // The output colour which will be output to the framebuffer
 layout (location=0) out vec4 FragColor;
@@ -42,8 +43,8 @@ struct LightInfo {
 
 // We'll have a single light in the scene with some default values
 uniform LightInfo Light = LightInfo(
-            vec4(2.0, 2.0, 10.0, 1.0),   // position
-            vec3(0.2, 0.2, 0.2),        // La
+            vec4(100.0, 100.0, 100.0, 1.0),   // position
+            vec3(0.5, 0.5, 0.5),        // La
             vec3(1.0, 1.0, 1.0),        // Ld
             vec3(1.0, 1.0, 1.0)         // Ls
             );
@@ -60,20 +61,21 @@ struct MaterialInfo {
 // chrome values from devernay.free.fr/cours/opengl/materials.html
 
 uniform MaterialInfo Material = MaterialInfo(
-            vec3(0.25, 0.25, 0.25),    // Ka
-            vec3(0.4, 0.4, 0.4),    // Kd
-            vec3(0.774597, 0.774597,0.774597),    // Ks
-           0.6                    // Shininess
+            vec3(0.0, 0.0, 0.0),    // Ka
+            vec3(0.5, 0.5, 0.5),    // Kd
+            vec3(0.7, 0.6,0.6),    // Ks
+           0.25                    // Shininess
             );
 
 // This is no longer a built-in variabl
 //out vec4 FragColor;
 
 // colour of material
-vec4 materialColor= vec4(0.38f,0.07f,0.5686f,1.0f);
+vec4 materialColor= vec4(0.38f,0.07f,0.5686f,0.7f);
 
 /** From http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
   */
+
 mat4 rotationMatrix(vec3 axis, float angle)
 {
     //axis = normalize(axis);
@@ -150,6 +152,11 @@ void main() {
     vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
 
     // Set the output color of our current pixel
+    //FragColor.a=0.1;
    FragColor = vec4(lightColor, 1.0) * materialColor*colour;
+
+   //FragColor.a = 0.0;
+
+
 
 }

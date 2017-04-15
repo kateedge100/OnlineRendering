@@ -6,6 +6,19 @@
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
 
+/// THINGS TO DO
+/// get transparency working - DONE!
+/// adjust refraction for plastic - DONE!
+/// add shadow map
+/// add roughness
+/// add noise
+/// add depth of field
+/// add groundplane
+/// add more lights
+/// do report
+/// DONE
+
+
 ShaderScene::ShaderScene() : Scene() {}
 
 /**
@@ -23,6 +36,12 @@ void ShaderScene::initGL() noexcept {
 
     // enable multisampling for smoother drawing
     glEnable(GL_MULTISAMPLE);
+
+    glEnable(GL_BLEND);
+
+    // Allows transparency
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Create and compile all of our shaders
     ngl::ShaderLib *plasticShader=ngl::ShaderLib::instance();
@@ -83,6 +102,9 @@ void ShaderScene::paintGL() noexcept {
     // Clear the screen (fill with our glClearColor)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Allows transparency
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // Set up the viewport
     glViewport(0,0,m_width,m_height);
 
@@ -119,6 +141,7 @@ void ShaderScene::paintGL() noexcept {
                        glm::value_ptr(N)); // a raw pointer to the data
 
     m_meshPlastic->draw();
+    //m_meshFloor->draw();
 
 
     // Use metal shader for this draw
