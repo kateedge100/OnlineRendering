@@ -19,11 +19,13 @@ public:
     /// Called when the scene is to be initialised
     void initGL() noexcept;
 
+    void depthMap();
+
 
 
 private:
 
-    GLuint m_envTex, m_glossMapTex, m_normalTexBody, m_normalTexCover;
+    GLuint m_envTex, m_glossMapTex, m_normalTexBody, m_normalTexCover,m_floorTex, shadowMap;
 
     void initEnvironment(std::string program);
 
@@ -32,6 +34,8 @@ private:
     void initEnvironmentSide(GLenum /*target*/, const char* /*filename*/);
 
 
+
+    GLuint m_frameBufferName, m_depthTexture;
 
     std::unique_ptr<ngl::Obj> m_meshPlastic;
     std::unique_ptr<ngl::Obj> m_meshMetal;

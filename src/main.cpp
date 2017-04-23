@@ -85,7 +85,7 @@ int main() {
     int width = 1024; int height = 768;
     GLFWwindow* window = glfwCreateWindow(width, // width 
                                           height, // height
-                                          "My Title", // title 
+                                          "Rendering Assignment", // title
                                           nullptr, // monitor for full screen
                                           nullptr); // return value on failure
 
@@ -123,6 +123,8 @@ int main() {
 
     // Initialise our OpenGL scene
     g_scene.initGL();
+
+    g_scene.depthMap();
 
     // Set the window resize callback and call it once
     glfwSetFramebufferSizeCallback(window, resize_callback);

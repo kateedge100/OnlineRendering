@@ -6,10 +6,14 @@
 uniform sampler2D NormalTexture;
 uniform sampler2D ColourTexture;
 
+uniform sampler2D shadowMap;
+
 // Attributes passed on from the vertex shader
 smooth in vec3 WSVertexPosition;
 smooth in vec3 WSVertexNormal;
 smooth in vec2 WSTexCoord;
+
+smooth in vec4 ShadowCoord;
 
 // A texture unit for storing the 3D texture
 uniform samplerCube envMap;
@@ -65,12 +69,12 @@ uniform MaterialInfo Material = MaterialInfo(
             vec3(0.25, 0.25, 0.25),    // Ka
             vec3(0.4, 0.4, 0.4),    // Kd
             vec3(0.774597, 0.774597,0.774597),    // Ks
-           0.6                    // Shininess
+           0.9                    // Shininess
             );
 
 
 // colour of material
-vec4 materialColor= vec4(0.7f,0.7f,0.7f,1.0f);
+vec4 materialColor= vec4(0.9f,0.9f,0.9f,1.0f);
 
 /** From http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
   */
@@ -143,6 +147,17 @@ void main() {
             Light.Ld * Material.Kd * max( dot(s, n), 0.0 ) +
             Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ));
 
+    float
+     bias = 0.005;
+    float
+     shade = 1.0;
+    float
+     depth =texture(shadowMap, ShadowCoord.xy).z;
+    if
+     (depth < (ShadowCoord.z - bias)) {
+    shade = 0.5;
+    }
+
     // Determine the gloss value from our input texture, and scale it by our LOD resolution
     float gloss = (1.0 - texture(glossMap, WSTexCoord*2).r) * float(envMaxLOD);
 
@@ -152,6 +167,8 @@ void main() {
     vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
 
     // Set the output color of our current pixel
-    FragColor = vec4(lightColor, 1.0)*materialColor*colour;
+    FragColor = vec4(lightColor, 1.0)*vec4(shade,shade,shade,1);//*materialColor*colour;
+
+    //FragColor = vec4(gl_FragCoord.z);
 
 }

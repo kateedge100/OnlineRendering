@@ -8,6 +8,8 @@ smooth in vec3 WSVertexPosition;
 smooth in vec3 WSVertexNormal;
 smooth in vec2 WSTexCoord;
 
+smooth in vec4 ShadowCoord;
+
 uniform sampler2D NormalTexture;
 uniform sampler2D ColourTexture;
 
@@ -19,6 +21,8 @@ uniform int envMaxLOD = 8;
 
 // Set our gloss map texture
 uniform sampler2D glossMap;
+
+uniform sampler2D shadowMap;
 
 // The inverse View matrix
 uniform mat4 invV;
@@ -43,7 +47,7 @@ struct LightInfo {
 
 // We'll have a single light in the scene with some default values
 uniform LightInfo Light = LightInfo(
-            vec4(100.0, 100.0, 100.0, 1.0),   // position
+            vec4(1000.0, 1000.0, 1000.0, 1.0),   // position
             vec3(0.5, 0.5, 0.5),        // La
             vec3(1.0, 1.0, 1.0),        // Ld
             vec3(1.0, 1.0, 1.0)         // Ls
@@ -71,7 +75,7 @@ uniform MaterialInfo Material = MaterialInfo(
 //out vec4 FragColor;
 
 // colour of material
-vec4 materialColor= vec4(0.38f,0.07f,0.5686f,0.7f);
+vec4 materialColor= vec4(0.38f,0.07f,0.5686f,0.9f);
 
 /** From http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
   */
@@ -147,15 +151,32 @@ void main() {
     float gloss = (1.0 - texture(glossMap, WSTexCoord*2).r) * float(envMaxLOD);
 
     // This call determines the current LOD value for the texture map
-    vec4 colour = textureLod(envMap, lookup, gloss);
+    vec4 colour = textureLod(envMap, lookup, gloss) * materialColor;
 
     vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
 
+
+    float
+     bias = 0.005;
+    float
+     shade = 1.0;
+    float
+     depth =texture(shadowMap, ShadowCoord.xy).z;
+    if
+     (depth < (ShadowCoord.z - bias)) {
+    shade = 0.5;
+    }
+
+    float depthColor = texture(shadowMap, ShadowCoord.xy).z;
+
+    //lightColor = lightColor*vec3(shade,shade,shade);
+
+
     // Set the output color of our current pixel
     //FragColor.a=0.1;
-   FragColor = vec4(lightColor, 1.0) * materialColor*colour;
+   FragColor = vec4(lightColor, 1.0) * vec4(shade,shade,shade,1);//*colour;
 
-   //FragColor.a = 0.0;
+   //FragColor = vec4(gl_FragCoord.z);
 
 
 

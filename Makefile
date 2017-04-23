@@ -60,7 +60,9 @@ OBJECTS       = obj/main.o \
 		obj/scene.o \
 		obj/trackballcamera.o \
 		obj/shaderscene.o
-DIST          = .qmake.stash \
+DIST          = shaders/shadow_frag.glsl \
+		shaders/shadow_vert.glsl \
+		.qmake.stash \
 		memoryStick.pro ../common/include/camera.h \
 		../common/include/fixedcamera.h \
 		../common/include/scene.h \

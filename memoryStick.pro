@@ -23,15 +23,18 @@ OTHER_FILES += shaders/plastic_vert.glsl \
                shaders/plastic_frag.glsl \
                shaders/metal_vert.glsl \
                shaders/metal_frag.glsl \
-               shaders/bump_vert.glsl \
-               shaders/bump_frag.glsl \
-               shaders/env_vert.glsl \
-               shaders/env_frag.glsl \
+               shaders/floor_vert.glsl \
+               shaders/floor_frag.glsl \
                models/memoryStickPlastic.obj \
                models/memoryStickMetal.obj \
                models/memoryStickAdaptor.obj \
                models/memoryStickFloor.obj \
-               images/cubeX.png
+               models/floor.obj \
+               images/floor.jpg
+
+DISTFILES += \
+    shaders/shadow_frag.glsl \
+    shaders/shadow_vert.glsl
 
 
 
