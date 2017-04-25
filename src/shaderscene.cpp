@@ -11,7 +11,7 @@
 /// adjust refraction for plastic - DONE!
 /// add shadow map
 /// add roughness
-/// add noise
+/// add noise - simpley
 /// add depth of field
 /// add groundplane
 /// add more lights
@@ -118,16 +118,15 @@ void ShaderScene::initGL() noexcept {
 
 void ShaderScene::depthMap()
 {
-    // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-
-
+    glGenFramebuffers(1, &m_frameBufferName);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferName);
 
      // Depth texture. Slower than a depth buffer, but you can sample it later in your shader
      glGenTextures(1, &m_depthTexture);
      glBindTexture(GL_TEXTURE_2D, m_depthTexture);
 
      // give empty image to openGL
-     glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT16, 1024, 1024, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+     glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT16, m_width, m_height, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 
      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -136,8 +135,7 @@ void ShaderScene::depthMap()
 
      glBindTexture(GL_TEXTURE_2D, 0);
 
-     glGenFramebuffers(1, &m_frameBufferName);
-     glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferName);
+
 
      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);
 
@@ -182,27 +180,22 @@ void ShaderScene::paintGL() noexcept {
     MVP = m_P * MV;
 
     // light position
-    glm::vec3 lightDir = glm::vec3(1000,1000,1000);
+    glm::vec3 lightDir = glm::vec3(5,5,5);
     // Centre (target) vector
-    glm::vec3 target = glm::vec3(0,0,0);
+    glm::vec3 target = glm::vec3(0,3,0);
     // UP vector
     glm::vec3 up = glm::vec3(0,1,0);
 
-    glm::mat4 depthProjection = glm::ortho <float>(-10,10,-10,10,-10,20);
+    glm::mat4 depthProjection = m_P;//glm::ortho <float>(-10,10,-10,10,1,100);
     glm::mat4 depthView = glm::lookAt(lightDir, target, up);
     glm::mat4 depthModel = glm::mat4(1.0);
     glm::mat4 depthMVP = depthProjection * depthView * depthModel;
 
-//    //Bind the frame buffer (future renders go here)
-   glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferName);
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //Bind the frame buffer (future renders go here)
+    glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferName);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-//    //Set the viewport ( may differ from screen resolution)
-
-//   //glViewport(0,0,1024,1024);
-
-    // Use plastic shader for this draw
     ngl::ShaderLib *shadowShader=ngl::ShaderLib::instance();
     GLint pid;
 
@@ -222,7 +215,7 @@ void ShaderScene::paintGL() noexcept {
                        1, // how many matrices to transfer
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
-    glUniformMatrix4fv(glGetUniformLocation(pid, "depthMV"), //location of uniform
+    glUniformMatrix4fv(glGetUniformLocation(pid, "depthMVP"), //location of uniform
                        1, // how many matrices to transfer
                        false, // whether to transpose matrix
                        glm::value_ptr(depthMVP)); // a raw pointer to the data
@@ -232,18 +225,12 @@ void ShaderScene::paintGL() noexcept {
     m_meshMetal->draw();
     m_meshAdaptor->draw();
 
-glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //Unbind our frame buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-//     //Unbind our frame buffer
-
-//    //
-//    //glViewport(0,0,1024,1024);
-
-//    // Now bind our FB colour and dpth to be used as texture in next render pass
-   //glActiveTexture(GL_TEXTURE5);
-
-     //glBindTexture(GL_TEXTURE_2D, m_depthTexture);
-     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Reset viewport
+    glViewport(0, 0, m_width, m_height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
     // Use plastic shader for this draw
@@ -259,14 +246,14 @@ glBindFramebuffer(GL_FRAMEBUFFER, 0);
 //    glm::mat4 MVP, MV;
 //    glm::mat3 N;
 
-    glm::mat4 B = glm::mat4(0.5,0,0,0.5,0,0.5,0,0.5,0,0,0.5,0.5,0,0,0,1);
+    glm::mat4 B = glm::mat4(0.5,0,0,0,0,0.5,0,0,0,0,0.5,0,0.5,0.5,0.5,1);
 
     glm::mat4 depthTransMVP = B * depthMVP;
 
     // Note the matrix multiplication order as we are in COLUMN MAJOR storage
-    MV = m_V * M;
-    N = glm::inverse(glm::mat3(MV));
-    MVP = m_P * MV;
+    //MV = m_V * M;
+    //N = glm::inverse(glm::mat3(MV));
+    //MVP = m_P * MV;
 
     // Set this MVP on the GPU
     glUniformMatrix4fv(glGetUniformLocation(pid2, "MVP"), //location of uniform
@@ -281,17 +268,22 @@ glBindFramebuffer(GL_FRAMEBUFFER, 0);
                        1, // how many matrices to transfer
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
-    glUniformMatrix4fv(glGetUniformLocation(pid2, "depthTransMV"), //location of uniform
+    glUniformMatrix4fv(glGetUniformLocation(pid2, "depthTransMVP"), //location of uniform
                        1, // how many matrices to transfer
                        false, // whether to transpose matrix
                        glm::value_ptr(depthTransMVP)); // a raw pointer to the data
 
 
-    glUniform1i(glGetUniformLocation(shadowShader->getProgramID("PlasticProgram"), "shadowMap"), //location of uniform
-                       5); // texture unit for floor texture
 
     glActiveTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, shadowMap);
+
+    glBindTexture(GL_TEXTURE_2D,m_depthTexture);
+
+    glUniform1i(glGetUniformLocation(pid2, "shadowMap"), //location of uniform
+                       5); // texture unit for floor texture
+
+
+
 
     m_meshPlastic->draw();
     m_meshFloor->draw();
@@ -317,13 +309,13 @@ glBindFramebuffer(GL_FRAMEBUFFER, 0);
                        1, // how many matrices to transfer
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
-    glUniformMatrix4fv(glGetUniformLocation(pid3, "depthTransMV"), //location of uniform
+    glUniformMatrix4fv(glGetUniformLocation(pid3, "depthTransMVP"), //location of uniform
                        1, // how many matrices to transfer
                        false, // whether to transpose matrix
                        glm::value_ptr(depthTransMVP)); // a raw pointer to the data//m_meshPlastic->draw();
 
-    m_meshMetal->draw();
-    m_meshAdaptor->draw();
+    //m_meshMetal->draw();
+    //m_meshAdaptor->draw();
 
 //    // Use flooor shader for this draw
     ngl::ShaderLib *floorShader=ngl::ShaderLib::instance();

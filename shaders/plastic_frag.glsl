@@ -24,6 +24,8 @@ uniform sampler2D glossMap;
 
 uniform sampler2D shadowMap;
 
+//uniform sampler2D m_depthTexture;
+
 // The inverse View matrix
 uniform mat4 invV;
 
@@ -47,7 +49,7 @@ struct LightInfo {
 
 // We'll have a single light in the scene with some default values
 uniform LightInfo Light = LightInfo(
-            vec4(1000.0, 1000.0, 1000.0, 1.0),   // position
+            vec4(5.0, 5.0, 5.0, 1.0),   // position
             vec3(0.5, 0.5, 0.5),        // La
             vec3(1.0, 1.0, 1.0),        // Ld
             vec3(1.0, 1.0, 1.0)         // Ls
@@ -151,32 +153,31 @@ void main() {
     float gloss = (1.0 - texture(glossMap, WSTexCoord*2).r) * float(envMaxLOD);
 
     // This call determines the current LOD value for the texture map
-    vec4 colour = textureLod(envMap, lookup, gloss) * materialColor;
+    vec4 colour = textureLod(envMap, lookup, gloss);
 
     vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
 
 
-    float
-     bias = 0.005;
-    float
-     shade = 1.0;
-    float
-     depth =texture(shadowMap, ShadowCoord.xy).z;
-    if
-     (depth < (ShadowCoord.z - bias)) {
-    shade = 0.5;
+//    float
+//     bias = 0.005;
+//    float
+//     shade = 1.0;
+//    float
+//     depth =texture(shadowMap, ShadowCoord.xy).z;
+//    if
+//     (depth < (ShadowCoord.z - bias)) {
+//    shade = 0.5;
+//    }
+
+    float visibility = 1.0;
+    if ( texture( shadowMap, ShadowCoord.xy ).z  <  ShadowCoord.z){
+        visibility = 0.5;
     }
 
-    float depthColor = texture(shadowMap, ShadowCoord.xy).z;
+   // Set the output color of our current pixel
+   FragColor = vec4(visibility,visibility,visibility,1);//vec4(lightColor, 1.0) * colour * materialColor;
 
-    //lightColor = lightColor*vec3(shade,shade,shade);
-
-
-    // Set the output color of our current pixel
-    //FragColor.a=0.1;
-   FragColor = vec4(lightColor, 1.0) * vec4(shade,shade,shade,1);//*colour;
-
-   //FragColor = vec4(gl_FragCoord.z);
+  // FragColor = vec4(gl_FragCoord.z);
 
 
 

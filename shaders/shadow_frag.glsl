@@ -6,14 +6,15 @@
 
 
 // The output colour which will be output to the framebuffer
-layout (location=0) out float fragmentdepth;
-uniform sampler2D depthTexture;
+layout (location=0) out vec4 FragColor;
+
+//uniform sampler2D depthTexture;
 
 
 void main() {
 
     // Use the following shader for the correct value
-    fragmentdepth = gl_FragCoord.z;
+    FragColor = vec4(gl_FragCoord.z);
 }
 
 

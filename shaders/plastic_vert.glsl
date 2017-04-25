@@ -11,7 +11,6 @@ uniform mat4 P;
 uniform mat3 N; // This is the inverse transpose of the mv matrix
 
 uniform mat4 depthTransMVP;
-uniform mat4 depthMVP;
 
 // The vertex position attribute
 layout (location=0) in vec3 VertexPosition;

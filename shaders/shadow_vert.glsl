@@ -7,6 +7,8 @@
 
 uniform mat4 depthMVP;
 
+uniform mat4 MVP;
+
 // The vertex position attribute
 layout (location=0) in vec3 VertexPosition;
 

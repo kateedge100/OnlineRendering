@@ -45,7 +45,7 @@ struct LightInfo {
 
 // We'll have a single light in the scene with some default values
 uniform LightInfo Light = LightInfo(
-            vec4(10.0,10.0, 10.0, 1.0),   // position
+            vec4(1.0,1.0, 1.0, 1.0),   // position
             vec3(0.2, 0.2, 0.2),        // La
             vec3(1.0, 1.0, 1.0),        // Ld
             vec3(1.0, 1.0, 1.0)         // Ls
@@ -167,7 +167,7 @@ void main() {
     vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
 
     // Set the output color of our current pixel
-    FragColor = vec4(lightColor, 1.0)*vec4(shade,shade,shade,1);//*materialColor*colour;
+    FragColor = vec4(lightColor, 1.0)*materialColor*colour;
 
     //FragColor = vec4(gl_FragCoord.z);
 
