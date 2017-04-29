@@ -39,6 +39,36 @@ uniform float refractiveIndex = 1.4906;
 // The output colour which will be output to the framebuffer
 layout (location=0) out vec4 FragColor;
 
+
+
+
+uniform vec2 u_resolution = vec2(768, 1024);
+
+
+vec2 random2(vec2 st){
+    st = vec2( dot(st,vec2(127.1,311.7)),
+              dot(st,vec2(269.5,183.3)) );
+    return -1.0 + 2.0*fract(sin(st)*43758.5453123);
+}
+
+// Value Noise by Inigo Quilez - iq/2013
+// https://www.shadertoy.com/view/lsf3WH
+float noise(vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+
+    vec2 u = f*f*(3.0-2.0*f);
+
+    return mix( mix( dot( random2(i + vec2(0.0,0.0) ), f - vec2(0.0,0.0) ),
+                     dot( random2(i + vec2(1.0,0.0) ), f - vec2(1.0,0.0) ), u.x),
+                mix( dot( random2(i + vec2(0.0,1.0) ), f - vec2(0.0,1.0) ),
+                     dot( random2(i + vec2(1.0,1.0) ), f - vec2(1.0,1.0) ), u.x), u.y);
+}
+
+
+
+
+
 // Structure for holding light parameters
 struct LightInfo {
     vec4 Position; // Light position in eye coords.
@@ -149,13 +179,7 @@ void main() {
             Light.Ld * Material.Kd * max( dot(s, n), 0.0 ) +
             Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ));
 
-    // Determine the gloss value from our input texture, and scale it by our LOD resolution
-    float gloss = (1.0 - texture(glossMap, WSTexCoord*2).r) * float(envMaxLOD);
 
-    // This call determines the current LOD value for the texture map
-    vec4 colour = textureLod(envMap, lookup, gloss);
-
-    vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
 
 
 //    float
@@ -169,14 +193,32 @@ void main() {
 //    shade = 0.5;
 //    }
 
+    vec2 st = gl_FragCoord.xy/u_resolution.xy;
+    st.x *= u_resolution.x/u_resolution.y;
+    float Noisecolor = 0.0;
+
+    vec2 pos = vec2(st*100.0);
+
+    Noisecolor = vec3( noise(pos)*.5+.5 ).r;
+
+    // Determine the gloss value from our input texture, and scale it by our LOD resolution
+    float gloss = (1.0 - Noisecolor) * float(envMaxLOD);
+
+    // This call determines the current LOD value for the texture map
+    vec4 colour = textureLod(envMap, lookup, gloss);
+
+    vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
+
     float visibility = 1.0;
     if ( texture( shadowMap, ShadowCoord.xy ).z  <  ShadowCoord.z){
         visibility = 0.5;
     }
 
-   // Set the output color of our current pixel
-   FragColor = vec4(visibility,visibility,visibility,1);//vec4(lightColor, 1.0) * colour * materialColor;
+    float depth = texture( shadowMap, ShadowCoord.xy ).z;
 
+   // Set the output color of our current pixel
+   FragColor = vec4(lightColor, 1.0) * colour * materialColor;
+//vec4(Noisecolor,Noisecolor,Noisecolor,1);
   // FragColor = vec4(gl_FragCoord.z);
 
 

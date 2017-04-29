@@ -11,10 +11,11 @@
 /// adjust refraction for plastic - DONE!
 /// add shadow map
 /// add roughness
-/// add noise - simpley
+/// add noise - simplex
 /// add depth of field
-/// add groundplane
+/// add groundplane - done!
 /// add more lights
+/// fix model
 /// do report
 /// DONE
 
@@ -47,14 +48,20 @@ void ShaderScene::initGL() noexcept {
     ngl::ShaderLib *plasticShader=ngl::ShaderLib::instance();
     plasticShader->loadShader("PlasticProgram","shaders/plastic_vert.glsl","shaders/plastic_frag.glsl");
 
+
     ngl::ShaderLib *metalShader=ngl::ShaderLib::instance();
     metalShader->loadShader("MetalProgram","shaders/metal_vert.glsl","shaders/metal_frag.glsl");
+
 
     ngl::ShaderLib *shadowShader=ngl::ShaderLib::instance();
     shadowShader->loadShader("ShadowProgram","shaders/shadow_vert.glsl","shaders/shadow_frag.glsl");
 
+
     ngl::ShaderLib *floorShader=ngl::ShaderLib::instance();
-    floorShader->loadShader("FloorProgram","shaders/shadow_vert.glsl","shaders/shadow_frag.glsl");
+    floorShader->loadShader("FloorProgram","shaders/floor_vert.glsl","shaders/floor_frag.glsl");
+
+
+
 
 
 
@@ -68,29 +75,35 @@ void ShaderScene::initGL() noexcept {
 
 
 
-    // Initialise our environment map here
+    // Initialise our environment map here at texture unit 0
     initEnvironment("PlasticProgram");
 
+    plasticShader->use("PlasticProgram");
     // Set the active texture unit on the GPU
     GLint pid = plasticShader->getProgramID("PlasticProgram");
-    //glUniform1i(glGetUniformLocation(pid, "envMap"), //location of uniform
-                       //0); // texture unit for norma
+    glUniform1i(glGetUniformLocation(pid, "envMap"), //location of uniform
+                       0); // texture unit for norma
     glUniform1i(glGetUniformLocation(pid, "NormalTexture"), //location of unifor
                        1); // texture unit for normas
     glUniform1i(glGetUniformLocation(pid, "glossMap"), //location of uniform
                                    3); // texture unit for normas
+    glUniform1i(glGetUniformLocation(pid, "shadowMap"), //location of uniform
+                       5); // texture unit for floor texture
 
 
 
-    initEnvironment("MetalProgram");
+    metalShader->use("MetalProgram");
+    //initEnvironment("MetalProgram");
     GLint pid2 = metalShader->getProgramID("MetalProgram");
-    //glUniform1i(glGetUniformLocation(pid2, "envMap"), //location of uniform
-                       //0); // texture unit for norma
+    glUniform1i(glGetUniformLocation(pid2, "envMap"), //location of uniform
+                       0); // texture unit for norma
     glUniform1i(glGetUniformLocation(pid2, "NormalTexture"), //location of uniform
                        2); // texture unit for normas
     glUniform1i(glGetUniformLocation(pid2, "glossMap"), //location of uniform
                        3); // texture unit for normas
 
+
+    floorShader->use("FloorProgram");
     GLint pid3 = floorShader->getProgramID("FloorProgram");
     glUniform1i(glGetUniformLocation(pid3, "floorTex"), //location of uniform
                        4); // texture unit for floor texture
@@ -133,7 +146,7 @@ void ShaderScene::depthMap()
      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-     glBindTexture(GL_TEXTURE_2D, 0);
+     //glBindTexture(GL_TEXTURE_2D, 0);
 
 
 
@@ -228,10 +241,6 @@ void ShaderScene::paintGL() noexcept {
     //Unbind our frame buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // Reset viewport
-    glViewport(0, 0, m_width, m_height);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
     // Use plastic shader for this draw
     ngl::ShaderLib *plasticShader=ngl::ShaderLib::instance();
@@ -279,14 +288,11 @@ void ShaderScene::paintGL() noexcept {
 
     glBindTexture(GL_TEXTURE_2D,m_depthTexture);
 
-    glUniform1i(glGetUniformLocation(pid2, "shadowMap"), //location of uniform
-                       5); // texture unit for floor texture
-
 
 
 
     m_meshPlastic->draw();
-    m_meshFloor->draw();
+    //m_meshFloor->draw();
 
 
 
@@ -314,8 +320,8 @@ void ShaderScene::paintGL() noexcept {
                        false, // whether to transpose matrix
                        glm::value_ptr(depthTransMVP)); // a raw pointer to the data//m_meshPlastic->draw();
 
-    //m_meshMetal->draw();
-    //m_meshAdaptor->draw();
+    m_meshMetal->draw();
+    m_meshAdaptor->draw();
 
 //    // Use flooor shader for this draw
     ngl::ShaderLib *floorShader=ngl::ShaderLib::instance();
@@ -337,7 +343,10 @@ void ShaderScene::paintGL() noexcept {
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
 
-    //m_meshFloor->draw();
+    glUniform1i(glGetUniformLocation(pid4, "shadowMap"), //location of uniform
+                       5); // texture unit for floor texture
+
+    m_meshFloor->draw();
 
 }
 
@@ -411,10 +420,10 @@ void ShaderScene::initEnvironment(std::string program) {
     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropy);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy);
 
-    // Set our cube map texture to on the shader so we can use it
-    ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-    shader->use(program);
-    shader->setUniform("envMap", 0);
+//    // Set our cube map texture to on the shader so we can use it
+//    ngl::ShaderLib *shader=ngl::ShaderLib::instance();
+//    shader->use(program);
+//    shader->setUniform("envMap", 0);
 //
 
 
