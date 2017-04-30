@@ -5,30 +5,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 uniform sampler2D floorTex;
 uniform sampler2D shadowMap;
 
@@ -37,7 +13,7 @@ smooth in vec3 WSVertexPosition;
 smooth in vec3 WSVertexNormal;
 smooth in vec2 WSTexCoord;
 
-
+smooth in vec4 ShadowCoord;
 
 layout (location=0) out vec4 FragColor;
 
@@ -51,7 +27,7 @@ struct LightInfo {
 
 // We'll have a single light in the scene with some default values
 uniform LightInfo Light = LightInfo(
-            vec4(5.0, 10.0, 5.0, 1.0),   // position
+            vec4(100.0, 100.0, 100.0, 1.0),   // position
             vec3(0.2, 0.2, 0.2),        // La
             vec3(1.0, 1.0, 1.0),        // Ld
             vec3(1.0, 1.0, 1.0)         // Ls
@@ -70,7 +46,7 @@ uniform MaterialInfo Material = MaterialInfo(
             vec3(0.1, 0.1, 0.1),    // Ka
             vec3(1.0, 1.0, 1.0),    // Kd
             vec3(1.0, 1.0, 1.0),    // Ks
-            10.0                    // Shininess
+            5.0                    // Shininess
             );
 
 // This is no longer a built-in variable
@@ -95,10 +71,22 @@ void main() {
             Light.Ld * Material.Kd * max( dot(s, n), 0.0 ) +
             Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ));
 
+    float
+     bias = 0.005;
+    float
+     shade = 1.0;
+    float
+     depth = texture(shadowMap, ShadowCoord.xy).z;
+    if
+     (depth < (ShadowCoord.z - bias)) {
+    shade = 0.5;
+    }
+
+
 
     vec3 texColor = texture(floorTex, WSTexCoord).rgb;
 
     // Set the output color of our current pixel
-    FragColor = vec4(lightColor, 1.0) * vec4(texColor,1.0);
+    FragColor = vec4(vec3(shade),1) * vec4(lightColor, 1.0) * vec4(texColor,1.0);
 
 }

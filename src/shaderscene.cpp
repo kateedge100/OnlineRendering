@@ -76,7 +76,7 @@ void ShaderScene::initGL() noexcept {
 
 
     // Initialise our environment map here at texture unit 0
-    initEnvironment("PlasticProgram");
+    initEnvironment();
 
     plasticShader->use("PlasticProgram");
     // Set the active texture unit on the GPU
@@ -87,13 +87,13 @@ void ShaderScene::initGL() noexcept {
                        1); // texture unit for normas
     glUniform1i(glGetUniformLocation(pid, "glossMap"), //location of uniform
                                    3); // texture unit for normas
-    glUniform1i(glGetUniformLocation(pid, "shadowMap"), //location of uniform
-                       5); // texture unit for floor texture
+    //glUniform1i(glGetUniformLocation(pid, "shadowMap"), //location of uniform
+                      // 5); // texture unit for floor texture
 
 
 
     metalShader->use("MetalProgram");
-    //initEnvironment("MetalProgram");
+
     GLint pid2 = metalShader->getProgramID("MetalProgram");
     glUniform1i(glGetUniformLocation(pid2, "envMap"), //location of uniform
                        0); // texture unit for norma
@@ -124,10 +124,12 @@ void ShaderScene::initGL() noexcept {
     m_meshAdaptor->createVAO();
 
     // Load the Obj file and create a Vertex Array Object
-    m_meshFloor.reset(new ngl::Obj("models/floor.obj"));
+    m_meshFloor.reset(new ngl::Obj("models/memoryStickFloor.obj"));
     m_meshFloor->createVAO();
 
 }
+
+
 
 void ShaderScene::depthMap()
 {
@@ -146,7 +148,7 @@ void ShaderScene::depthMap()
      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-     //glBindTexture(GL_TEXTURE_2D, 0);
+     glBindTexture(GL_TEXTURE_2D, 0);
 
 
 
@@ -238,6 +240,10 @@ void ShaderScene::paintGL() noexcept {
     m_meshMetal->draw();
     m_meshAdaptor->draw();
 
+
+
+
+
     //Unbind our frame buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -284,15 +290,17 @@ void ShaderScene::paintGL() noexcept {
 
 
 
-    glActiveTexture(GL_TEXTURE5);
+//    glActiveTexture(GL_TEXTURE5);
 
-    glBindTexture(GL_TEXTURE_2D,m_depthTexture);
+//    glBindTexture(GL_TEXTURE_2D,m_depthTexture);
 
+//    glUniform1i(glGetUniformLocation(pid2, "shadowMap"), //location of uniform
+//                           5); // texture unit for floor texture
 
 
 
     m_meshPlastic->draw();
-    //m_meshFloor->draw();
+
 
 
 
@@ -320,10 +328,12 @@ void ShaderScene::paintGL() noexcept {
                        false, // whether to transpose matrix
                        glm::value_ptr(depthTransMVP)); // a raw pointer to the data//m_meshPlastic->draw();
 
+    glUniform1i(glGetUniformLocation(pid3, "shadowMap"), //location of uniform
+                           5); // texture unit for floor texture
     m_meshMetal->draw();
     m_meshAdaptor->draw();
 
-//    // Use flooor shader for this draw
+    // Use flooor shader for this draw
     ngl::ShaderLib *floorShader=ngl::ShaderLib::instance();
     GLint pid4;
     (*floorShader)["FloorProgram"]->use();
@@ -342,11 +352,19 @@ void ShaderScene::paintGL() noexcept {
                        1, // how many matrices to transfer
                        true, // whether to transpose matrix
                        glm::value_ptr(N)); // a raw pointer to the data
+    glUniformMatrix4fv(glGetUniformLocation(pid4, "depthTransMVP"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(depthTransMVP)); // a raw pointer to the data//m_meshPlastic->draw();
+
 
     glUniform1i(glGetUniformLocation(pid4, "shadowMap"), //location of uniform
                        5); // texture unit for floor texture
 
     m_meshFloor->draw();
+
+
+
 
 }
 
@@ -385,7 +403,7 @@ void ShaderScene::initTexture(const GLuint& texUnit, GLuint &texId, const char *
 /**
  * @brief Scene::initEnvironment in texture unit 0
  */
-void ShaderScene::initEnvironment(std::string program) {
+void ShaderScene::initEnvironment() {
     // Enable seamless cube mapping
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 

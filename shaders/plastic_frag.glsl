@@ -79,7 +79,7 @@ struct LightInfo {
 
 // We'll have a single light in the scene with some default values
 uniform LightInfo Light = LightInfo(
-            vec4(5.0, 5.0, 5.0, 1.0),   // position
+            vec4(100.0, 100.0, 100.0, 1.0),   // position
             vec3(0.5, 0.5, 0.5),        // La
             vec3(1.0, 1.0, 1.0),        // Ld
             vec3(1.0, 1.0, 1.0)         // Ls
@@ -97,17 +97,17 @@ struct MaterialInfo {
 // chrome values from devernay.free.fr/cours/opengl/materials.html
 
 uniform MaterialInfo Material = MaterialInfo(
-            vec3(0.0, 0.0, 0.0),    // Ka
+            vec3(0.1, 0.1, 0.1),    // Ka
             vec3(0.5, 0.5, 0.5),    // Kd
             vec3(0.7, 0.6,0.6),    // Ks
-           0.25                    // Shininess
+           0.55                    // Shininess
             );
 
 // This is no longer a built-in variabl
 //out vec4 FragColor;
 
 // colour of material
-vec4 materialColor= vec4(0.38f,0.07f,0.5686f,0.9f);
+vec4 materialColor= vec4(0.38f*1.2,0.07f*1.2,0.5686f*1.2,0.9f);
 
 /** From http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
   */
@@ -182,16 +182,16 @@ void main() {
 
 
 
-//    float
-//     bias = 0.005;
-//    float
-//     shade = 1.0;
-//    float
-//     depth =texture(shadowMap, ShadowCoord.xy).z;
-//    if
-//     (depth < (ShadowCoord.z - bias)) {
-//    shade = 0.5;
-//    }
+    float
+     bias = 0.005;
+    float
+     shade = 1.0;
+    float
+     depth = texture(shadowMap, ShadowCoord.xy).z;
+    if
+     (depth < (ShadowCoord.z - bias)) {
+    shade = 0.5;
+    }
 
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
     st.x *= u_resolution.x/u_resolution.y;
@@ -209,15 +209,16 @@ void main() {
 
     vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
 
-    float visibility = 1.0;
-    if ( texture( shadowMap, ShadowCoord.xy ).z  <  ShadowCoord.z){
-        visibility = 0.5;
-    }
+    // calculate shadows
+//    float visibility = 1.0;
+//    if ( texture( shadowMap, ShadowCoord.xy ).z  <  ShadowCoord.z){
+//        visibility = 0.5;
+//    }
 
-    float depth = texture( shadowMap, ShadowCoord.xy ).z;
+//    float depth = texture( shadowMap, ShadowCoord.xy ).z;
 
    // Set the output color of our current pixel
-   FragColor = vec4(lightColor, 1.0) * colour * materialColor;
+   FragColor = vec4(vec3(shade),1);//vec4(vec3(visibility),1);//vec4(lightColor, 1.0) * colour * materialColor;
 //vec4(Noisecolor,Noisecolor,Noisecolor,1);
   // FragColor = vec4(gl_FragCoord.z);
 

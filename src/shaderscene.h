@@ -21,13 +21,15 @@ public:
 
     void depthMap();
 
+    void backgroundCube();
+
 
 
 private:
 
-    GLuint m_envTex, m_glossMapTex, m_normalTexBody, m_normalTexCover,m_floorTex, shadowMap;
+    GLuint m_envTex, m_glossMapTex, m_normalTexBody, m_normalTexCover,m_floorTex, m_testTex;
 
-    void initEnvironment(std::string program);
+    void initEnvironment();
 
     void initTexture(const GLuint&, GLuint &, const char *);
 
