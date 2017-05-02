@@ -13,7 +13,9 @@ layout (location=0) out vec4 FragColor;
 
 void main() {
 
+
     // Use the following shader for the correct value
+    //FragColor = vec4(gl_FragCoord.z,0,0,1);
     FragColor = vec4(gl_FragCoord.z);
 }
 

@@ -2,6 +2,7 @@
 #define SHADERSCENE_H
 
 // The parent class for this scene
+
 #include "scene.h"
 
 #include <ngl/Obj.h>
@@ -37,7 +38,7 @@ private:
 
 
 
-    GLuint m_frameBufferName, m_depthTexture;
+    GLuint m_frameBufferName, m_depthTexture, tmp;
 
     std::unique_ptr<ngl::Obj> m_meshPlastic;
     std::unique_ptr<ngl::Obj> m_meshMetal;

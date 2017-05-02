@@ -7,6 +7,7 @@
 
 uniform sampler2D floorTex;
 uniform sampler2D shadowMap;
+uniform sampler2D depthMap;
 
 // Attributes passed on from the vertex shader
 smooth in vec3 WSVertexPosition;
@@ -82,11 +83,12 @@ void main() {
     shade = 0.5;
     }
 
-    vec3 depthC = texture(shadowMap, ShadowCoord.xy).rgb;
+   float shadowC = texture(shadowMap, ShadowCoord.xy).r;
+   float depthC = texture(depthMap, ShadowCoord.xy).r;
 
     vec3 texColor = texture(floorTex, WSTexCoord).rgb;
 
     // Set the output color of our current pixel
-    FragColor = vec4(depthC,1);//vec4(vec3(shade),1);// * vec4(lightColor, 1.0) * vec4(texColor,1.0);
-
+   // FragColor = vec4(vec3(shade),1) * vec4(lightColor, 1.0) * vec4(texColor,1.0);
+   FragColor = vec4( shadowC,0,0,1);
 }

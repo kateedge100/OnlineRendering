@@ -23,6 +23,7 @@ uniform int envMaxLOD = 8;
 uniform sampler2D glossMap;
 
 uniform sampler2D shadowMap;
+uniform sampler2D depthMap;
 
 //uniform sampler2D m_depthTexture;
 
@@ -182,16 +183,7 @@ void main() {
 
 
 
-    float
-     bias = 0.005;
-    float
-     shade = 1.0;
-    float
-     depth = texture(shadowMap, ShadowCoord.xy).z;
-    if
-     (depth < (ShadowCoord.z - bias)) {
-    shade = 0.5;
-    }
+
 
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
     st.x *= u_resolution.x/u_resolution.y;
@@ -217,10 +209,27 @@ void main() {
 
 //    float depth = texture( shadowMap, ShadowCoord.xy ).z;
 
+
+    float
+     bias = 0.005;
+    float
+     shade = 1.0;
+    float
+     depth = texture(shadowMap, ShadowCoord.xy).z;
+    if
+     (depth < (ShadowCoord.z - bias)) {
+    shade = 0.5;
+    }
+
+
+
+    float depthC = texture(depthMap, ShadowCoord.xy).z;
+    vec3 colorC = texture(shadowMap, ShadowCoord.xy).rgb;
+
    // Set the output color of our current pixel
-   FragColor = /*vec4(vec3(shade),1);*/vec4(lightColor, 1.0) * colour * materialColor;
+   FragColor = vec4(vec3(colorC),1);//vec4(vec3(visibility),1);//vec4(lightColor, 1.0) * colour * materialColor;
 //vec4(Noisecolor,Noisecolor,Noisecolor,1);
-  // FragColor = vec4(gl_FragCoord.z);
+   //FragColor = vec4(gl_FragCoord.z);
 
 
 
