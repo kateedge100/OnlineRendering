@@ -148,7 +148,7 @@ void ShaderScene::depthMap()
      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-     glBindTexture(GL_TEXTURE_2D, 0);
+     //glBindTexture(GL_TEXTURE_2D, 0);
 
 
 
@@ -290,12 +290,12 @@ void ShaderScene::paintGL() noexcept {
 
 
 
-//    glActiveTexture(GL_TEXTURE5);
+    glActiveTexture(GL_TEXTURE5);
 
-//    glBindTexture(GL_TEXTURE_2D,m_depthTexture);
+    glBindTexture(GL_TEXTURE_2D,m_depthTexture);
 
-//    glUniform1i(glGetUniformLocation(pid2, "shadowMap"), //location of uniform
-//                           5); // texture unit for floor texture
+    glUniform1i(glGetUniformLocation(pid2, "shadowMap"), //location of uniform
+                           5); // texture unit for floor texture
 
 
 
