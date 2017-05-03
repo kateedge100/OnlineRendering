@@ -224,10 +224,10 @@ void main() {
 
 
     float depthC = texture(depthMap, ShadowCoord.xy).z;
-    vec3 colorC = texture(shadowMap, ShadowCoord.xy).rgb;
+    float colorC = texture(shadowMap, ShadowCoord.xy).r;
 
    // Set the output color of our current pixel
-   FragColor = vec4(vec3(colorC),1);//vec4(vec3(visibility),1);//vec4(lightColor, 1.0) * colour * materialColor;
+   FragColor = vec4(WSTexCoord,0,1);//vec4(vec3(visibility),1);//vec4(lightColor, 1.0) * colour * materialColor;
 //vec4(Noisecolor,Noisecolor,Noisecolor,1);
    //FragColor = vec4(gl_FragCoord.z);
 
