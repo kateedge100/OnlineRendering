@@ -86,10 +86,10 @@ void main() {
    vec3 shadowC = texture(shadowMap, ShadowCoord.xy).rgb;
    float depthC = texture(depthMap, ShadowCoord.xy).z;
 
-    vec3 texColor = texture(floorTex,ShadowCoord.xy).rgb;
+    vec3 texColor = texture(floorTex,WSTexCoord).rgb;
 
     // Set the output color of our current pixel
-    //FragColor = vec4(vec3(shade),1) * vec4(lightColor, 1.0) * vec4(texColor,1.0);
+    FragColor =  vec4(lightColor, 1.0) * vec4(texColor,1.0);
     //FragColor = vec4( depthC,0,0,1);
-    FragColor = vec4(texColor,1.0);
+    //FragColor = vec4(texColor,1.0);
 }

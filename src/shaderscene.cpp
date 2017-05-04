@@ -28,7 +28,7 @@ void ShaderScene::initGL() noexcept {
     ngl::NGLInit::instance();   
 
     // Set background colour
-    glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     // Enable 2D texturing
     glEnable(GL_TEXTURE_2D);
@@ -72,7 +72,7 @@ void ShaderScene::initGL() noexcept {
     // Initialise our gloss texture map here
     initTexture(3, m_glossMapTex, "images/gloss.png");
     // Initialise our foor textur here
-    //initTexture(4, m_floorTex, "images/floor.jpg");
+    initTexture(4, m_floorTex, "images/floor.jpg");
 
 
 
@@ -142,16 +142,16 @@ void ShaderScene::depthMap()
     glBindTexture(GL_TEXTURE_2D,tmp);
     glTexImage2D(GL_TEXTURE_2D,
                  0,
-                 GL_RGB,
+                 GL_RGBA,
                  m_width,
                  m_height,
                  0,
-                 GL_RGB,
+                 GL_RGBA,
                  GL_UNSIGNED_BYTE,
                  NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
 
     // The depth buffer is rendered to a texture buffer too
 
@@ -169,7 +169,7 @@ void ShaderScene::depthMap()
                  NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create the frame buffer
     glGenFramebuffers(1, &m_frameBufferName);
@@ -250,7 +250,7 @@ void ShaderScene::paintGL() noexcept {
     glm::vec3 up = glm::vec3(0,1,0);
 
     //glm::mat4 depthProjection = m_P;//glm::ortho <float>(-10,10,-10,10,1,100);
-    glm::mat4 depthProjection = glm::ortho <float>(-10,10,-10,10,-5,5);
+    glm::mat4 depthProjection = glm::ortho <float>(-10,10,-10,10,-10,10);
     glm::mat4 depthView = glm::lookAt(lightDir, target, up);
     glm::mat4 depthModel = glm::mat4(1.0);
     glm::mat4 depthMVP = depthProjection * depthView * depthModel;
@@ -290,10 +290,10 @@ void ShaderScene::paintGL() noexcept {
                        glm::value_ptr(depthMVP)); // a raw pointer to the data
 
     m_meshPlastic->draw();
-    //m_meshFloor->draw();
+    m_meshFloor->draw();
 
-    ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
-    prim->draw("plane");
+    //ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
+   // prim->draw("plane");
 
     m_meshMetal->draw();
     m_meshAdaptor->draw();
@@ -305,14 +305,16 @@ void ShaderScene::paintGL() noexcept {
     //Unbind our frame buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glViewport(0,0,m_width,m_height);
+
 
     glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D,tmp);
+
     glActiveTexture(GL_TEXTURE6);
     glBindTexture(GL_TEXTURE_2D,m_depthTexture);
 
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(0,0,m_width,m_height);
 
     // Use plastic shader for this draw
     ngl::ShaderLib *plasticShader=ngl::ShaderLib::instance();
@@ -321,18 +323,23 @@ void ShaderScene::paintGL() noexcept {
     (*plasticShader)["PlasticProgram"]->use();
     pid2 = plasticShader->getProgramID("PlasticProgram");
 
-    MV = m_V * M;
-    N = glm::inverse(glm::mat3(MV));
-    MVP = m_P * MV;
 
 
-    glm::mat4 B = glm::mat4(0.5,0,0,0.5,0,0.5,0,0.5,0,0,0.5,0.5,0,0,0,1);
+
+    glm::mat4 B = glm::mat4(0.5,0,0,0.5,
+                            0,0.5,0,0.5,
+                            0,0,0.5,0.5
+                            ,0,0,0,1);
+
+
 //    glm::mat4 B = glm::mat4(
 //                                0.5, 0.0, 0.0, 0.0,
 //                                0.0, 0.5, 0.0, 0.0,
 //                                0.0, 0.0, 0.5, 0.0,
 //                                0.5, 0.5, 0.5, 1.0
 //                                );
+
+
 
     glm::mat4 depthTransMVP = B * depthMVP;
 
@@ -403,8 +410,8 @@ void ShaderScene::paintGL() noexcept {
 //                           5); // texture unit for floor texture
 //    glUniform1i(glGetUniformLocation(pid3, "depthMap"), //location of uniform
 //                           6); // texture unit for floor texture
-//  //  m_meshMetal->draw();
-//   // m_meshAdaptor->draw();
+//    m_meshMetal->draw();
+//    m_meshAdaptor->draw();
 
 //    // Use flooor shader for this draw
 //    ngl::ShaderLib *floorShader=ngl::ShaderLib::instance();
@@ -436,7 +443,7 @@ void ShaderScene::paintGL() noexcept {
 //    glUniform1i(glGetUniformLocation(pid4, "depthMap"), //location of uniform
 //                           6); // texture unit for floor texture
 
-////   m_meshFloor->draw();
+//   m_meshFloor->draw();
 //    //MVP = glm::rotate(glm::mat4(1.0f), glm::pi<float>() * 0.5f, glm::vec3(1.0f,0.0f,0.0f));
 //    //glUniformMatrix4fv(glGetUniformLocation(pid, "MVP"), 1, false, glm::value_ptr(MVP));
 ////    ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();

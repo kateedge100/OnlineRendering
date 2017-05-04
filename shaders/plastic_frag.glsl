@@ -31,7 +31,7 @@ uniform sampler2D depthMap;
 uniform mat4 invV;
 
 // A toggle allowing you to set it to reflect or refract the light
-uniform bool isReflect = false;
+uniform bool isReflect = true;
 
 // Refractic index quiried from https://refractiveindex.info/?shelf=3d&book=plastics&page=pmma
 // Specify the refractive index for refractions
@@ -101,7 +101,7 @@ uniform MaterialInfo Material = MaterialInfo(
             vec3(0.1, 0.1, 0.1),    // Ka
             vec3(0.5, 0.5, 0.5),    // Kd
             vec3(0.7, 0.6,0.6),    // Ks
-           0.55                    // Shininess
+           0.1                    // Shininess
             );
 
 // This is no longer a built-in variabl
@@ -144,7 +144,43 @@ vec3 rotateVector(vec3 src, vec3 tgt, vec3 vec) {
     return _norm.xyz / _norm.w;
 }
 
+vec3 halfVector(vec3 v, vec3 s)
+{
+    vec3 norm = normalize(v + s);
+   vec3 h = (v + s)/norm;
+   return h;
+}
+
+float BeckmannDist(float m, vec3 n, vec3 h)
+{
+    float r1 = 1.0 / ( 4.0 * (m*m) * pow(dot(n,h), 4.0));
+    float r2 = (dot(n,h) * dot(n,h) - 1.0) / ((m*m) * dot(n,h) * dot(n,h));
+    float roughness = r1 * exp(r2);
+    return roughness;
+
+}
+
+float GeoAtten(vec3 n, vec3 h, vec3 v, vec3 l)
+{
+    // geometric attenuation
+    float NH2 = 2.0 * dot(n,h);
+    float invVdotH = 1.0 / max(dot(v,h), 0.0);
+    float g1 = (NH2 * dot(n,v)) * invVdotH;
+    float g2 = (NH2 * dot(n,l)) * invVdotH;
+    float geoAtt = min(1.0, min(g1, g2));
+    return geoAtt;
+}
+
+float Schlick(vec3 v, vec3 h)
+{
+    // Schlick approximation
+    float F0 = 0.8; // Fresnel reflectance at normal incidence
+    float fresnel = pow(1.0 - dot(v,h), 5.0) * (1.0 - F0) + F0;
+    return fresnel;
+}
+
 void main() {
+    /*
     // Calculate the normal (this is the expensive bit in Phong)
     vec3 n = normalize( WSVertexNormal );
 
@@ -174,10 +210,28 @@ void main() {
     // Reflect the light about the surface normal
     vec3 r = reflect( -s, np );
 
+    // calculate half vector
+   vec3 h =  halfVector(v,s);
+
+   // roughness value (between 0 and 1)
+   float m = 0.8;
+
+   // Beckmann distribution value
+   float Beckmann = BeckmannDist(m,n,h);
+
+   // Geometric Attentuation
+   float Geo = GeoAtten(n,h,v,s);
+
+   float Schlicks = Schlick(v,h);
+
+   vec3 MicroFacet = vec3(Beckmann,Geo,Schlicks)/dot(n,v);
+
+
+
     // Compute the light from the ambient, diffuse and specular components
     vec3 lightColor = (
             Light.La * Material.Ka +
-            Light.Ld * Material.Kd * max( dot(s, n), 0.0 ) +
+            Light.Ld * Material.Kd * max( dot(s, n), 0.0 )  +
             Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ));
 
 
@@ -225,9 +279,10 @@ void main() {
 
     float depthC = texture(depthMap, ShadowCoord.xy).z;
     float colorC = texture(shadowMap, ShadowCoord.xy).r;
-
+*/
    // Set the output color of our current pixel
-   FragColor = vec4(WSTexCoord,0,1);//vec4(vec3(visibility),1);//vec4(lightColor, 1.0) * colour * materialColor;
+   //FragColor = vec4(texture(shadowMap, ShadowCoord.xy).rgb,1); // vec4(colorC,0,0,1);// vec4(lightColor, 1.0) * materialColor * colour;
+   FragColor = vec4(texture(depthMap, WSTexCoord).rgb,1); // vec4(colorC,0,0,1);// vec4(lightColor, 1.0) * materialColor * colour;
 //vec4(Noisecolor,Noisecolor,Noisecolor,1);
    //FragColor = vec4(gl_FragCoord.z);
 
