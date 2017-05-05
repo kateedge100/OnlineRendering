@@ -25,6 +25,8 @@ OTHER_FILES += shaders/plastic_vert.glsl \
                shaders/metal_frag.glsl \
                shaders/floor_vert.glsl \
                shaders/floor_frag.glsl \
+               shaders/dof_vert.glsl \
+               shaders/dof_frag.glsl \
                models/memoryStickPlastic.obj \
                models/memoryStickMetal.obj \
                models/memoryStickAdaptor.obj \

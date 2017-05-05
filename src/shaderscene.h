@@ -11,6 +11,8 @@ class ShaderScene : public Scene
 {
 public:
 
+        /// An enumerated type to allow the user to select an alternative blur function
+        typedef enum {BLUR_GAUSSIAN, BLUR_POISSON} BlurFilter;
 
     ShaderScene();
 
@@ -24,6 +26,8 @@ public:
 
     void backgroundCube();
 
+    void setShaderSubroutine();
+
 
 
 private:
@@ -36,6 +40,9 @@ private:
 
     void initEnvironmentSide(GLenum /*target*/, const char* /*filename*/);
 
+    /// Keep track of whether the FBO needs to be recreated
+    bool m_isFBODirty = true;
+
 
 
     GLuint m_frameBufferName, m_depthTexture, tmp;
@@ -44,6 +51,20 @@ private:
     std::unique_ptr<ngl::Obj> m_meshMetal;
     std::unique_ptr<ngl::Obj> m_meshAdaptor;
     std::unique_ptr<ngl::Obj> m_meshFloor;
+
+
+
+    /// The focal depth
+    GLfloat m_focalDepth = 1.0f;
+
+    /// A weighting of the blur radius (bit like inverse focal length)
+    GLfloat m_blurRadius = 0.01f;
+
+    /// Id's used for the frame buffer object and associated textures
+    GLuint m_fboId, m_fboTextureId, m_fboDepthId;
+
+    /// The default blur filter to use
+    BlurFilter m_blurFilter = BLUR_GAUSSIAN;
 };
 
 #endif // SHADERSCENE_H

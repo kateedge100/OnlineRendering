@@ -1,4 +1,4 @@
-#version 150                                       // Keeping you on the bleeding edge!
+#version 430                                      // Keeping you on the bleeding edge!
 #extension GL_EXT_gpu_shader4 : enable
 #extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
@@ -80,7 +80,7 @@ struct LightInfo {
 
 // We'll have a single light in the scene with some default values
 uniform LightInfo Light = LightInfo(
-            vec4(100.0, 100.0, 100.0, 1.0),   // position
+            vec4(100.0, 100.0, 1.0, 1.0),   // position
             vec3(0.5, 0.5, 0.5),        // La
             vec3(1.0, 1.0, 1.0),        // Ld
             vec3(1.0, 1.0, 1.0)         // Ls
@@ -104,8 +104,6 @@ uniform MaterialInfo Material = MaterialInfo(
            0.1                    // Shininess
             );
 
-// This is no longer a built-in variabl
-//out vec4 FragColor;
 
 // colour of material
 vec4 materialColor= vec4(0.38f*1.2,0.07f*1.2,0.5686f*1.2,0.9f);
@@ -180,7 +178,7 @@ float Schlick(vec3 v, vec3 h)
 }
 
 void main() {
-    /*
+
     // Calculate the normal (this is the expensive bit in Phong)
     vec3 n = normalize( WSVertexNormal );
 
@@ -202,7 +200,7 @@ void main() {
     vec3 src = vec3(0.0, 0.0, 1.0);
 
     // Perturb the normal according to the target
-    vec3 np = rotateVector(src, tgt, n);
+    vec3 np = rotateVector(src, tgt, n)*100;
 
     // Calculate the light vector
     vec3 s = normalize( vec3(Light.Position) - WSVertexPosition );
@@ -214,7 +212,7 @@ void main() {
    vec3 h =  halfVector(v,s);
 
    // roughness value (between 0 and 1)
-   float m = 0.8;
+   float m = 0.9;
 
    // Beckmann distribution value
    float Beckmann = BeckmannDist(m,n,h);
@@ -224,7 +222,7 @@ void main() {
 
    float Schlicks = Schlick(v,h);
 
-   vec3 MicroFacet = vec3(Beckmann,Geo,Schlicks)/dot(n,v);
+   vec3 MicroFacet = vec3(Beckmann*Geo*Schlicks)/dot(n,v);
 
 
 
@@ -232,7 +230,7 @@ void main() {
     vec3 lightColor = (
             Light.La * Material.Ka +
             Light.Ld * Material.Kd * max( dot(s, n), 0.0 )  +
-            Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ));
+            Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ) * MicroFacet);
 
 
 
@@ -277,12 +275,11 @@ void main() {
 
 
 
-    float depthC = texture(depthMap, ShadowCoord.xy).z;
-    float colorC = texture(shadowMap, ShadowCoord.xy).r;
-*/
+
+
    // Set the output color of our current pixel
-   //FragColor = vec4(texture(shadowMap, ShadowCoord.xy).rgb,1); // vec4(colorC,0,0,1);// vec4(lightColor, 1.0) * materialColor * colour;
-   FragColor = vec4(texture(depthMap, WSTexCoord).rgb,1); // vec4(colorC,0,0,1);// vec4(lightColor, 1.0) * materialColor * colour;
+   FragColor = vec4(texture(shadowMap, ShadowCoord.xy).rgb,1); // vec4(colorC,0,0,1);// vec4(lightColor, 1.0) * materialColor * colour;
+   //FragColor =  vec4(lightColor, 1.0) * materialColor;//' * colour;
 //vec4(Noisecolor,Noisecolor,Noisecolor,1);
    //FragColor = vec4(gl_FragCoord.z);
 

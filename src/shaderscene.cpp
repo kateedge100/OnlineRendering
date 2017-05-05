@@ -7,10 +7,7 @@
 #include <ngl/ShaderLib.h>
 
 /// THINGS TO DO
-/// get transparency working - DONE!
-/// adjust refraction for plastic - DONE!
 /// add shadow map
-/// add roughness
 /// add depth of field
 /// add more lights
 /// fix model
@@ -28,7 +25,7 @@ void ShaderScene::initGL() noexcept {
     ngl::NGLInit::instance();   
 
     // Set background colour
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 
     // Enable 2D texturing
     glEnable(GL_TEXTURE_2D);
@@ -60,6 +57,9 @@ void ShaderScene::initGL() noexcept {
 
     ngl::ShaderLib *floorShader=ngl::ShaderLib::instance();
     floorShader->loadShader("FloorProgram","shaders/floor_vert.glsl","shaders/floor_frag.glsl");
+
+    ngl::ShaderLib *dofShader=ngl::ShaderLib::instance();
+    dofShader->loadShader("DOFProgram","shaders/dof_vert.glsl","shaders/dof_frag.glsl");
 
 
 
@@ -127,8 +127,12 @@ void ShaderScene::initGL() noexcept {
     m_meshFloor.reset(new ngl::Obj("models/memoryStickFloor.obj"));
     m_meshFloor->createVAO();
 
+//    ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
+//    prim->createTrianglePlane("plane",6,6,1,1,ngl::Vec3(0,1,0));
+
+    // Create a screen oriented plane
     ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
-    prim->createTrianglePlane("plane",6,6,1,1,ngl::Vec3(0,1,0));
+    prim->createTrianglePlane("plane",2,2,1,1,ngl::Vec3(0,1,0));
 
 }
 
@@ -136,6 +140,8 @@ void ShaderScene::initGL() noexcept {
 
 void ShaderScene::depthMap()
 {
+
+
     // Generate a texture to write the FBO result to
     glGenTextures(1, &tmp);
     glActiveTexture(GL_TEXTURE5);
@@ -226,10 +232,13 @@ void ShaderScene::depthMap()
 
 
 void ShaderScene::paintGL() noexcept {
-
+//glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Allows transparency
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Grab and instance of the VAO primitives path
+    ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
 
 
     // Our MVP matrices
@@ -313,7 +322,8 @@ void ShaderScene::paintGL() noexcept {
     glActiveTexture(GL_TEXTURE6);
     glBindTexture(GL_TEXTURE_2D,m_depthTexture);
 
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0,0,m_width,m_height);
 
     // Use plastic shader for this draw
@@ -371,13 +381,19 @@ void ShaderScene::paintGL() noexcept {
                            6); // texture unit for floor texture
 
 
-    m_meshPlastic->draw();
-    m_meshFloor->draw();
+    prim->draw("teapot");
+    //m_meshPlastic->draw();
+   // m_meshFloor->draw();
 
     //MVP = glm::rotate(glm::mat4(1.0f), glm::pi<float>() * 0.5f, glm::vec3(1.0f,0.0f,0.0f));
     //glUniformMatrix4fv(glGetUniformLocation(pid2, "MVP"), 1, false, glm::value_ptr(MVP));
    // ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
-    //prim->draw("plane");
+    prim->draw("plane");
+
+
+
+
+
 
 
 
@@ -444,14 +460,16 @@ void ShaderScene::paintGL() noexcept {
 //                           6); // texture unit for floor texture
 
 //   m_meshFloor->draw();
+
+
 //    //MVP = glm::rotate(glm::mat4(1.0f), glm::pi<float>() * 0.5f, glm::vec3(1.0f,0.0f,0.0f));
 //    //glUniformMatrix4fv(glGetUniformLocation(pid, "MVP"), 1, false, glm::value_ptr(MVP));
 ////    ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
 ////    prim->draw("plane");
 
 
-
  glBindTexture(GL_TEXTURE_2D, 0);
+
 
 }
 
@@ -558,5 +576,34 @@ void ShaderScene::initEnvironmentSide(GLenum target, const char *filename) {
       GL_UNSIGNED_BYTE, // Data type of pixel data
       img.getPixels()   // Pointer to image data in memory
     );
+}
+
+/**
+ * @brief DofScene::setShaderSubroutine
+ * GLSL handles subroutines very badly. Each shader can have many subroutines, and these
+ * are all set at once using an array with the indices of each of the subroutines to use.
+ */
+void ShaderScene::setShaderSubroutine() {
+    ngl::ShaderLib *dofshader=ngl::ShaderLib::instance();
+    (*dofshader)["DOFProgram"]->use();
+    GLint pid = dofshader->getProgramID("DOFProgram");
+
+    // Determine the different subroutine indices for our blur filters
+    GLuint GaussianFilter = glGetSubroutineIndex(pid, GL_FRAGMENT_SHADER, "GaussianFilter");
+    GLuint PoissonFilter = glGetSubroutineIndex(pid, GL_FRAGMENT_SHADER, "PoissonFilter");
+
+    // Technically these must all be set, but we should only have 1
+    GLuint blurFilter;
+    switch(m_blurFilter) {
+    case BLUR_POISSON:
+        blurFilter = PoissonFilter;
+        break;
+    default:
+        blurFilter = GaussianFilter;
+        break;
+    }
+
+    // Set the subroutine on the shader
+    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &blurFilter);
 }
 

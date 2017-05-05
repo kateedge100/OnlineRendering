@@ -1,4 +1,4 @@
-#version 150                                       // Keeping you on the bleeding edge!
+#version 430                                     // Keeping you on the bleeding edge!
 #extension GL_EXT_gpu_shader4 : enable
 #extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
@@ -16,7 +16,7 @@ void main() {
 
     // Use the following shader for the correct value
     //FragColor = vec4(gl_FragCoord.z,0,0,1);
-    FragColor = vec4(1,gl_FragCoord.z,1,1);
+    FragColor = vec4(vec3(gl_FragCoord.z),1);
 }
 
 
