@@ -1,5 +1,5 @@
-#version 430
-
+#version 150
+//#extension GL_ARB_explicit_attribute_location : require
 // The vertex position attribute
 layout (location=0) in vec3 VertexPosition;
 

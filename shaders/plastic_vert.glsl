@@ -1,8 +1,8 @@
-#version 430                                          // Keeping you on the bleeding edge!
+#version 150                                          // Keeping you on the bleeding edge!
 #extension GL_EXT_gpu_shader4 : enable
 #extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
-//#extension GL_ARB_shading_language_420pack: enable    // Use for GLSL versions before 420.
+#extension GL_ARB_shading_language_420pack: enable    // Use for GLSL versions before 420.
 
 // The modelview and projection matrices are no longer given in OpenGL 4.2
 uniform mat4 MVP;

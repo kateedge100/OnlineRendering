@@ -1,5 +1,5 @@
-#version 430
-
+#version 150
+#extension GL_ARB_explicit_attribute_location : require
 // The texture to be mapped
 uniform sampler2D colourTex;
 uniform sampler2D depthTex;

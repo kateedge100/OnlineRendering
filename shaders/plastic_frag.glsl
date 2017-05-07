@@ -1,4 +1,4 @@
-#version 430                                      // Keeping you on the bleeding edge!
+#version 150                                      // Keeping you on the bleeding edge!
 #extension GL_EXT_gpu_shader4 : enable
 #extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
@@ -106,7 +106,7 @@ uniform MaterialInfo Material = MaterialInfo(
 
 
 // colour of material
-vec4 materialColor= vec4(0.38f*1.2,0.07f*1.2,0.5686f*1.2,0.9f);
+vec4 materialColor= vec4(0.38f*1.2,0.07f*1.2,0.5686f*1.2,0.99f);
 
 /** From http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
   */
@@ -151,8 +151,8 @@ vec3 halfVector(vec3 v, vec3 s)
 
 float BeckmannDist(float m, vec3 n, vec3 h)
 {
-    float r1 = 1.0 / ( 4.0 * (m*m) * pow(dot(n,h), 4.0));
-    float r2 = (dot(n,h) * dot(n,h) - 1.0) / ((m*m) * dot(n,h) * dot(n,h));
+    float r1 = 1.0 / ( 4.0 * (m*m) * pow(max(dot(n,h),0.0), 4.0));
+    float r2 = (max(dot(n,h),0.0) * max(dot(n,h),0.0) - 1.0) / ((m*m) * max(dot(n,h),0.0) * max(dot(n,h),0.0));
     float roughness = r1 * exp(r2);
     return roughness;
 
@@ -161,10 +161,10 @@ float BeckmannDist(float m, vec3 n, vec3 h)
 float GeoAtten(vec3 n, vec3 h, vec3 v, vec3 l)
 {
     // geometric attenuation
-    float NH2 = 2.0 * dot(n,h);
+    float NH2 = 2.0 * max(dot(n,h),0.0);
     float invVdotH = 1.0 / max(dot(v,h), 0.0);
-    float g1 = (NH2 * dot(n,v)) * invVdotH;
-    float g2 = (NH2 * dot(n,l)) * invVdotH;
+    float g1 = (NH2 * max(dot(n,v),0.0)) * invVdotH;
+    float g2 = (NH2 * max(dot(n,l),0.0)) * invVdotH;
     float geoAtt = min(1.0, min(g1, g2));
     return geoAtt;
 }
@@ -173,7 +173,7 @@ float Schlick(vec3 v, vec3 h)
 {
     // Schlick approximation
     float F0 = 0.8; // Fresnel reflectance at normal incidence
-    float fresnel = pow(1.0 - dot(v,h), 5.0) * (1.0 - F0) + F0;
+    float fresnel = pow(1.0 - max(dot(v,h),0.0), 5.0) * (1.0 - F0) + F0;
     return fresnel;
 }
 
@@ -200,7 +200,7 @@ void main() {
     vec3 src = vec3(0.0, 0.0, 1.0);
 
     // Perturb the normal according to the target
-    vec3 np = rotateVector(src, tgt, n)*100;
+    vec3 np = rotateVector(src, tgt, n);
 
     // Calculate the light vector
     vec3 s = normalize( vec3(Light.Position) - WSVertexPosition );
@@ -214,6 +214,9 @@ void main() {
    // roughness value (between 0 and 1)
    float m = 0.9;
 
+   // fraction of diffuse reflection (specular reflection = 1 - k)
+   float k = 0.9;
+
    // Beckmann distribution value
    float Beckmann = BeckmannDist(m,n,h);
 
@@ -222,7 +225,7 @@ void main() {
 
    float Schlicks = Schlick(v,h);
 
-   vec3 MicroFacet = vec3(Beckmann*Geo*Schlicks)/dot(n,v);
+   vec3 MicroFacet = vec3(Beckmann*Geo*Schlicks)/ max(dot(n,v),0.0);
 
 
 
@@ -276,10 +279,12 @@ void main() {
 
 
 
+     vec3 finalValue = Light.Ld * max(dot(n,s), 0.0) *  max( dot(r,v), 0.0 ) * (k + MicroFacet * (1.0 - k));
+
 
    // Set the output color of our current pixel
-   FragColor = vec4(texture(shadowMap, ShadowCoord.xy).rgb,1); // vec4(colorC,0,0,1);// vec4(lightColor, 1.0) * materialColor * colour;
-   //FragColor =  vec4(lightColor, 1.0) * materialColor;//' * colour;
+   //FragColor = vec4(texture(shadowMap, ShadowCoord.xy).z,0,0,1); // vec4(colorC,0,0,1);// vec4(lightColor, 1.0) * materialColor * colour;
+   FragColor =  vec4(finalValue, 1.0) * materialColor;//' * colour;
 //vec4(Noisecolor,Noisecolor,Noisecolor,1);
    //FragColor = vec4(gl_FragCoord.z);
 

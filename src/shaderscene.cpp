@@ -58,8 +58,8 @@ void ShaderScene::initGL() noexcept {
     ngl::ShaderLib *floorShader=ngl::ShaderLib::instance();
     floorShader->loadShader("FloorProgram","shaders/floor_vert.glsl","shaders/floor_frag.glsl");
 
-    ngl::ShaderLib *dofShader=ngl::ShaderLib::instance();
-    dofShader->loadShader("DOFProgram","shaders/dof_vert.glsl","shaders/dof_frag.glsl");
+    //ngl::ShaderLib *dofShader=ngl::ShaderLib::instance();
+    //dofShader->loadShader("DOFProgram","shaders/dof_vert.glsl","shaders/dof_frag.glsl");
 
 
 
@@ -232,7 +232,7 @@ void ShaderScene::depthMap()
 
 
 void ShaderScene::paintGL() noexcept {
-//glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Allows transparency
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -298,14 +298,14 @@ void ShaderScene::paintGL() noexcept {
                        false, // whether to transpose matrix
                        glm::value_ptr(depthMVP)); // a raw pointer to the data
 
-    m_meshPlastic->draw();
-    m_meshFloor->draw();
+    //m_meshPlastic->draw();
+    //m_meshFloor->draw();
 
     //ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
-   // prim->draw("plane");
-
-    m_meshMetal->draw();
-    m_meshAdaptor->draw();
+    prim->draw("plane");
+    prim->draw("teapot");
+    //m_meshMetal->draw();
+    //m_meshAdaptor->draw();
 
 
 
@@ -381,14 +381,14 @@ void ShaderScene::paintGL() noexcept {
                            6); // texture unit for floor texture
 
 
-    prim->draw("teapot");
-    //m_meshPlastic->draw();
+    //prim->draw("teapot");
+    m_meshPlastic->draw();
    // m_meshFloor->draw();
 
     //MVP = glm::rotate(glm::mat4(1.0f), glm::pi<float>() * 0.5f, glm::vec3(1.0f,0.0f,0.0f));
     //glUniformMatrix4fv(glGetUniformLocation(pid2, "MVP"), 1, false, glm::value_ptr(MVP));
    // ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
-    prim->draw("plane");
+    //prim->draw("plane");
 
 
 
@@ -398,68 +398,68 @@ void ShaderScene::paintGL() noexcept {
 
 
 
-//    // Use metal shader for this draw
-//    ngl::ShaderLib *metalShader=ngl::ShaderLib::instance();
-//    GLint pid3;
-//    (*metalShader)["MetalProgram"]->use();
-//    pid3 = metalShader->getProgramID("MetalProgram");
+    // Use metal shader for this draw
+    ngl::ShaderLib *metalShader=ngl::ShaderLib::instance();
+    GLint pid3;
+    (*metalShader)["MetalProgram"]->use();
+    pid3 = metalShader->getProgramID("MetalProgram");
 
-//    // Set this MVP on the GPU
-//    glUniformMatrix4fv(glGetUniformLocation(pid3, "MVP"), //location of uniform
-//                       1, // how many matrices to transfer
-//                       false, // whether to transpose matrix
-//                       glm::value_ptr(MVP)); // a raw pointer to the data
-//    glUniformMatrix4fv(glGetUniformLocation(pid3, "MV"), //location of uniform
-//                       1, // how many matrices to transfer
-//                       false, // whether to transpose matrix
-//                       glm::value_ptr(MV)); // a raw pointer to the data
-//    glUniformMatrix3fv(glGetUniformLocation(pid3, "N"), //location of uniform
-//                       1, // how many matrices to transfer
-//                       true, // whether to transpose matrix
-//                       glm::value_ptr(N)); // a raw pointer to the data
-//    glUniformMatrix4fv(glGetUniformLocation(pid3, "depthTransMVP"), //location of uniform
-//                       1, // how many matrices to transfer
-//                       false, // whether to transpose matrix
-//                       glm::value_ptr(depthTransMVP)); // a raw pointer to the data//m_meshPlastic->draw();
+    // Set this MVP on the GPU
+    glUniformMatrix4fv(glGetUniformLocation(pid3, "MVP"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(MVP)); // a raw pointer to the data
+    glUniformMatrix4fv(glGetUniformLocation(pid3, "MV"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(MV)); // a raw pointer to the data
+    glUniformMatrix3fv(glGetUniformLocation(pid3, "N"), //location of uniform
+                       1, // how many matrices to transfer
+                       true, // whether to transpose matrix
+                       glm::value_ptr(N)); // a raw pointer to the data
+    glUniformMatrix4fv(glGetUniformLocation(pid3, "depthTransMVP"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(depthTransMVP)); // a raw pointer to the data//m_meshPlastic->draw();
 
-//    glUniform1i(glGetUniformLocation(pid3, "shadowMap"), //location of uniform
-//                           5); // texture unit for floor texture
-//    glUniform1i(glGetUniformLocation(pid3, "depthMap"), //location of uniform
-//                           6); // texture unit for floor texture
-//    m_meshMetal->draw();
-//    m_meshAdaptor->draw();
+    glUniform1i(glGetUniformLocation(pid3, "shadowMap"), //location of uniform
+                           5); // texture unit for floor texture
+    glUniform1i(glGetUniformLocation(pid3, "depthMap"), //location of uniform
+                           6); // texture unit for floor texture
+    m_meshMetal->draw();
+    m_meshAdaptor->draw();
 
-//    // Use flooor shader for this draw
-//    ngl::ShaderLib *floorShader=ngl::ShaderLib::instance();
-//    GLint pid4;
-//    (*floorShader)["FloorProgram"]->use();
-//    pid4 = floorShader->getProgramID("FloorProgram");
+    // Use flooor shader for this draw
+    ngl::ShaderLib *floorShader=ngl::ShaderLib::instance();
+    GLint pid4;
+    (*floorShader)["FloorProgram"]->use();
+    pid4 = floorShader->getProgramID("FloorProgram");
 
-//    // Set this MVP on the GPU
-//    glUniformMatrix4fv(glGetUniformLocation(pid4, "MVP"), //location of uniform
-//                       1, // how many matrices to transfer
-//                       false, // whether to transpose matrix
-//                       glm::value_ptr(MVP)); // a raw pointer to the data
-//    glUniformMatrix4fv(glGetUniformLocation(pid4, "MV"), //location of uniform
-//                       1, // how many matrices to transfer
-//                       false, // whether to transpose matrix
-//                       glm::value_ptr(MV)); // a raw pointer to the data
-//    glUniformMatrix3fv(glGetUniformLocation(pid4, "N"), //location of uniform
-//                       1, // how many matrices to transfer
-//                       true, // whether to transpose matrix
-//                       glm::value_ptr(N)); // a raw pointer to the data
-//    glUniformMatrix4fv(glGetUniformLocation(pid4, "depthTransMVP"), //location of uniform
-//                       1, // how many matrices to transfer
-//                       false, // whether to transpose matrix
-//                       glm::value_ptr(depthTransMVP)); // a raw pointer to the data//m_meshPlastic->draw();
+    // Set this MVP on the GPU
+    glUniformMatrix4fv(glGetUniformLocation(pid4, "MVP"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(MVP)); // a raw pointer to the data
+    glUniformMatrix4fv(glGetUniformLocation(pid4, "MV"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(MV)); // a raw pointer to the data
+    glUniformMatrix3fv(glGetUniformLocation(pid4, "N"), //location of uniform
+                       1, // how many matrices to transfer
+                       true, // whether to transpose matrix
+                       glm::value_ptr(N)); // a raw pointer to the data
+    glUniformMatrix4fv(glGetUniformLocation(pid4, "depthTransMVP"), //location of uniform
+                       1, // how many matrices to transfer
+                       false, // whether to transpose matrix
+                       glm::value_ptr(depthTransMVP)); // a raw pointer to the data//m_meshPlastic->draw();
 
 
-//    glUniform1i(glGetUniformLocation(pid4, "shadowMap"), //location of uniform
-//                           5); // texture unit for floor texture
-//    glUniform1i(glGetUniformLocation(pid4, "depthMap"), //location of uniform
-//                           6); // texture unit for floor texture
+    glUniform1i(glGetUniformLocation(pid4, "shadowMap"), //location of uniform
+                           5); // texture unit for floor texture
+    glUniform1i(glGetUniformLocation(pid4, "depthMap"), //location of uniform
+                           6); // texture unit for floor texture
 
-//   m_meshFloor->draw();
+   m_meshFloor->draw();
 
 
 //    //MVP = glm::rotate(glm::mat4(1.0f), glm::pi<float>() * 0.5f, glm::vec3(1.0f,0.0f,0.0f));
