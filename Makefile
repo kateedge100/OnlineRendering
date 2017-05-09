@@ -49,15 +49,15 @@ OBJECTS_DIR   = obj/
 ####### Files
 
 SOURCES       = src/main.cpp \
-		src/dofscene.cpp \
 		../common/src/scene.cpp \
 		../common/src/camera.cpp \
-		../common/src/trackballcamera.cpp 
+		../common/src/trackballcamera.cpp \
+		src/shaderScene.cpp 
 OBJECTS       = obj/main.o \
-		obj/dofscene.o \
 		obj/scene.o \
 		obj/camera.o \
-		obj/trackballcamera.o
+		obj/trackballcamera.o \
+		obj/shaderScene.o
 DIST          = shaders/dof_frag.glsl \
 		shaders/dof_vert.glsl \
 		shaders/plastic_frag.glsl \
@@ -70,14 +70,14 @@ DIST          = shaders/dof_frag.glsl \
 		shaders/shadow_frag.glsl \
 		model/memoryStickPlastic.obj \
 		.qmake.stash \
-		memoryStick.pro src/dofscene.h \
-		../common/include/scene.h \
+		memoryStick.pro ../common/include/scene.h \
 		../common/include/camera.h \
-		../common/include/trackballcamera.h src/main.cpp \
-		src/dofscene.cpp \
+		../common/include/trackballcamera.h \
+		src/shaderScene.h src/main.cpp \
 		../common/src/scene.cpp \
 		../common/src/camera.cpp \
-		../common/src/trackballcamera.cpp
+		../common/src/trackballcamera.cpp \
+		src/shaderScene.cpp
 QMAKE_TARGET  = memoryStick
 DESTDIR       = 
 TARGET        = memoryStick
@@ -426,8 +426,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents src/dofscene.h ../common/include/scene.h ../common/include/camera.h ../common/include/trackballcamera.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/main.cpp src/dofscene.cpp ../common/src/scene.cpp ../common/src/camera.cpp ../common/src/trackballcamera.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../common/include/scene.h ../common/include/camera.h ../common/include/trackballcamera.h src/shaderScene.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/main.cpp ../common/src/scene.cpp ../common/src/camera.cpp ../common/src/trackballcamera.cpp src/shaderScene.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -469,7 +469,7 @@ compiler_clean:
 
 ####### Compile
 
-obj/main.o: src/main.cpp src/dofscene.h \
+obj/main.o: src/main.cpp src/shaderScene.h \
 		../common/include/scene.h \
 		/home/i7426159/Desktop/Rendering/Online/Assignment/common/include/glinclude.h \
 		/home/i7426159/NGL/include/ngl/Obj.h \
@@ -501,7 +501,18 @@ obj/main.o: src/main.cpp src/dofscene.h \
 		../common/include/fixedcamera.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/main.o src/main.cpp
 
-obj/dofscene.o: src/dofscene.cpp src/dofscene.h \
+obj/scene.o: ../common/src/scene.cpp ../common/include/scene.h \
+		/home/i7426159/Desktop/Rendering/Online/Assignment/common/include/glinclude.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/scene.o ../common/src/scene.cpp
+
+obj/camera.o: ../common/src/camera.cpp /home/i7426159/Desktop/Rendering/Online/Assignment/common/include/camera.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/camera.o ../common/src/camera.cpp
+
+obj/trackballcamera.o: ../common/src/trackballcamera.cpp ../common/include/trackballcamera.h \
+		/home/i7426159/Desktop/Rendering/Online/Assignment/common/include/camera.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/trackballcamera.o ../common/src/trackballcamera.cpp
+
+obj/shaderScene.o: src/shaderScene.cpp src/shaderScene.h \
 		../common/include/scene.h \
 		/home/i7426159/Desktop/Rendering/Online/Assignment/common/include/glinclude.h \
 		/home/i7426159/NGL/include/ngl/Obj.h \
@@ -536,18 +547,7 @@ obj/dofscene.o: src/dofscene.cpp src/dofscene.h \
 		/home/i7426159/NGL/include/ngl/Util.h \
 		/home/i7426159/NGL/include/ngl/Mat3.h \
 		/home/i7426159/NGL/include/ngl/Mat4.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/dofscene.o src/dofscene.cpp
-
-obj/scene.o: ../common/src/scene.cpp ../common/include/scene.h \
-		/home/i7426159/Desktop/Rendering/Online/Assignment/common/include/glinclude.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/scene.o ../common/src/scene.cpp
-
-obj/camera.o: ../common/src/camera.cpp /home/i7426159/Desktop/Rendering/Online/Assignment/common/include/camera.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/camera.o ../common/src/camera.cpp
-
-obj/trackballcamera.o: ../common/src/trackballcamera.cpp ../common/include/trackballcamera.h \
-		/home/i7426159/Desktop/Rendering/Online/Assignment/common/include/camera.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/trackballcamera.o ../common/src/trackballcamera.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/shaderScene.o src/shaderScene.cpp
 
 ####### Install
 

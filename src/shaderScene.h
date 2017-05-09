@@ -65,7 +65,7 @@ private:
     /// Set the currently desired shader subroutine on the shader (from m_blurFilter)
     void setShaderSubroutine();
 
-    GLuint m_frameBufferName, m_depthTexture, tmp;
+    GLuint m_frameBufferName, m_depthTexture, m_shadowMap;
 
     std::unique_ptr<ngl::Obj> m_meshPlastic;
     std::unique_ptr<ngl::Obj> m_meshMetal;

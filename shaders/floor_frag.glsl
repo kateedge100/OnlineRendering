@@ -75,17 +75,14 @@ void main() {
             Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ));
 
 
-    vec3 projCoords = ShadowCoord.xyz / ShadowCoord.w;
-    projCoords = projCoords * 0.5 + 0.5;
 
     float
      bias = 0.005;
     float
      shade = 1.0;
-    float
-     depth = texture(shadowMap, WSTexCoord).x;
-    if
-     (depth < (projCoords.x - bias)) {
+
+    if ( texture( shadowMap, (ShadowCoord.xy/ShadowCoord.w) ).z  <  (ShadowCoord.z-bias)/ShadowCoord.w )
+    {
     shade = 0.5;
     }
 
@@ -95,7 +92,7 @@ void main() {
     vec3 texColor = texture(floorTex,WSTexCoord).rgb;
 
     // Set the output color of our current pixel
-    FragColor =  vec4( vec3(texture(shadowMap, projCoords.xy).x),1.0);
+    FragColor =  vec4((ShadowCoord.xy/ShadowCoord.w),0.0,1.0);
     //FragColor = vec4( depthC,0,0,1);
     //FragColor = vec4(texColor,1.0);
 }
