@@ -1,5 +1,5 @@
 // Must include our scene first because of GL dependency order
-#include "dofscene.h"
+#include "shaderScene.h"
 #include "firstpersoncamera.h"
 #include "trackballcamera.h"
 #include "fixedcamera.h"

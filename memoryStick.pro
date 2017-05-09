@@ -3,19 +3,20 @@
 ######################################################################
 
 include(../common/common.pri)
-TARGET = dof
+TARGET = memoryStick
 
 # Input
 SOURCES += src/main.cpp \
-           src/dofscene.cpp \
            ../common/src/scene.cpp \
            ../common/src/camera.cpp \
-           ../common/src/trackballcamera.cpp
+           ../common/src/trackballcamera.cpp \
+    src/shaderScene.cpp
 
-HEADERS += src/dofscene.h \
+HEADERS += \
            ../common/include/scene.h \
            ../common/include/camera.h \
-           ../common/include/trackballcamera.h
+           ../common/include/trackballcamera.h \
+    src/shaderScene.h
 
 OTHER_FILES += shaders/*.glsl
 
@@ -31,7 +32,6 @@ DISTFILES += \
                shaders/shadow_vert.glsl \
                shaders/shadow_frag.glsl \
              model/memoryStickPlastic.obj \
-             ../common/shaders/gouraud_frag.glsl \
-             ../common/shaders/gouraud_vert.glsl
+
 	
 	
