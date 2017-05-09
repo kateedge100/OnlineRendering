@@ -240,8 +240,8 @@ void DofScene::drawScene(std::string _pass)
         // UP vector
         glm::vec3 up = glm::vec3(0,1,0);
 
-        //glm::mat4 depthProjection = m_P;//glm::ortho <float>(-10,10,-10,10,1,100);
-        glm::mat4 depthProjection = glm::perspective<float>(45.0f, 1.0f, 1.0f, 100.0f);
+        glm::mat4 depthProjection = glm::ortho <float>(-10,10,-10,10,-10,10);
+        //glm::mat4 depthProjection = glm::perspective<float>(45.0f, 1.0f, 1.0f, 100.0f);
         glm::mat4 depthView = glm::lookAt(lightDir, target, up);
         glm::mat4 depthModel = glm::mat4(1.0);
         glm::mat4 depthMVP =  depthProjection *  depthView * depthModel;

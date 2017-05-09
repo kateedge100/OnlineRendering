@@ -46,6 +46,6 @@ void main()
 
 
 
-    vec4 ShadowCoord = depthTransMVP * vec4(VertexPosition,1);
+    vec4 ShadowCoord = depthMVP * vec4(VertexPosition,1);
 
 }
