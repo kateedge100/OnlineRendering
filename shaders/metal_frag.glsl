@@ -1,5 +1,5 @@
-#version 150                                       // Keeping you on the bleeding edge!
-#extension GL_ARB_explicit_attrib_location : require
+#version 430                                       // Keeping you on the bleeding edge!
+//#extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
 
 #define MAX_LIGHTS 2
@@ -164,11 +164,9 @@ void main() {
     // This call determines the current LOD value for the texture map
     vec4 colour = textureLod(envMap, lookup, gloss);
 
-    vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
-
     // Set the output color of our current pixel
     FragColor = vec4(lightColor, 1.0)*materialColor*colour;
 
-    //FragColor = vec4(gl_FragCoord.z);
+    //FragColor =  vec4(vec3(texture(shadowMap, WSTexCoord).x), 1.0);
 
 }

@@ -1,6 +1,6 @@
-#version 150                                       // Keeping you on the bleeding edge!
+#version 430                                      // Keeping you on the bleeding edge!
 #extension GL_EXT_gpu_shader4 : enable
-#extension GL_ARB_explicit_attrib_location : require
+//#extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
 
 //#extension GL_ARB_shading_language_420pack: enable    // Use for GLSL versions before 420.
@@ -10,6 +10,7 @@ uniform mat4 MVP;
 uniform mat4 MV;
 uniform mat3 N; // This is the inverse transpose of the mv matrix
 uniform mat4 depthTransMVP;
+uniform mat4 depthMVP;
 
 // The vertex position attribute
 layout (location=0) in vec3 VertexPosition;
@@ -27,6 +28,8 @@ smooth out vec2 WSTexCoord;
 
 smooth out vec4 ShadowCoord;
 
+
+
 void main()
 {
     // Transform the vertex normal by the inverse transpose modelview matrix
@@ -43,6 +46,6 @@ void main()
 
 
 
-   // vec4 ShadowCoord = depthTransMVP * vec4(VertexPosition,1);
+    vec4 ShadowCoord = depthTransMVP * vec4(VertexPosition,1);
 
 }

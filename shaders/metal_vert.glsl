@@ -1,6 +1,6 @@
-#version 150                                          // Keeping you on the bleeding edge!
+#version 430                                        // Keeping you on the bleeding edge!
 #extension GL_EXT_gpu_shader4 : enable
-#extension GL_ARB_explicit_attrib_location : require
+//#extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
 //#extension GL_ARB_shading_language_420pack: enable    // Use for GLSL versions before 420.
 
@@ -42,5 +42,5 @@ void main()
     // Compute the position of the vertex
     gl_Position = MVP * vec4(VertexPosition,1.0);
 
-    //vec4 ShadowCoord = depthTransMVP * vec4(VertexPosition,1);
+    vec4 ShadowCoord = depthTransMVP * vec4(VertexPosition,1);
 }

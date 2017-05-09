@@ -1,5 +1,7 @@
-#version 150
-#extension GL_ARB_explicit_attribute_location : require
+#version 430
+
+// Author: Richard Southern
+
 // The texture to be mapped
 uniform sampler2D colourTex;
 uniform sampler2D depthTex;
@@ -102,6 +104,6 @@ void main() {
     float sigma = abs(focalDepth - texture(depthTex, texpos).x) * blurRadius;
 
     // Now execute the use specified blur function on this pixel based on the depth difference
-    fragColor = texture(colourTex, texpos);//blurFunction(texpos, sigma);
+    fragColor = blurFunction(texpos, sigma);
 }
 

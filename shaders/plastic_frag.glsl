@@ -1,6 +1,6 @@
-#version 150                                      // Keeping you on the bleeding edge!
+#version 430                                      // Keeping you on the bleeding edge!
 #extension GL_EXT_gpu_shader4 : enable
-#extension GL_ARB_explicit_attrib_location : require
+//#extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
 
 // Attributes passed on from the vertex shader
@@ -106,7 +106,7 @@ uniform MaterialInfo Material = MaterialInfo(
 
 
 // colour of material
-vec4 materialColor= vec4(0.38f*1.2,0.07f*1.2,0.5686f*1.2,0.99f);
+vec4 materialColor= vec4(0.38f*1.2,0.07f*1.2,0.5686f*1.2,0.5f)*1.5;
 
 /** From http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
   */
@@ -172,8 +172,13 @@ float GeoAtten(vec3 n, vec3 h, vec3 v, vec3 l)
 float Schlick(vec3 v, vec3 h)
 {
     // Schlick approximation
-    float F0 = 0.8; // Fresnel reflectance at normal incidence
-    float fresnel = pow(1.0 - max(dot(v,h),0.0), 5.0) * (1.0 - F0) + F0;
+    float F0 = 0.5; // Fresnel reflectance at normal incidence
+
+
+
+    float fresnel = pow(1.0 - max(dot(v,h),0.0), 5.0);
+    fresnel *= (1.0 - F0);
+    fresnel += F0;
     return fresnel;
 }
 
@@ -209,7 +214,7 @@ void main() {
     vec3 r = reflect( -s, np );
 
     // calculate half vector
-   vec3 h =  halfVector(v,s);
+   vec3 h = normalize(s + v);
 
    // roughness value (between 0 and 1)
    float m = 0.9;
@@ -228,12 +233,11 @@ void main() {
    vec3 MicroFacet = vec3(Beckmann*Geo*Schlicks)/ max(dot(n,v),0.0);
 
 
-
     // Compute the light from the ambient, diffuse and specular components
     vec3 lightColor = (
             Light.La * Material.Ka +
             Light.Ld * Material.Kd * max( dot(s, n), 0.0 )  +
-            Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ) * MicroFacet);
+            Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ) );
 
 
 
@@ -254,7 +258,6 @@ void main() {
     // This call determines the current LOD value for the texture map
     vec4 colour = textureLod(envMap, lookup, gloss);
 
-    vec3 texColor = texture(ColourTexture, WSTexCoord).rgb;
 
     // calculate shadows
 //    float visibility = 1.0;
@@ -278,15 +281,28 @@ void main() {
 
 
 
+    float specular = 0.0;
 
-     vec3 finalValue = Light.Ld * max(dot(n,s), 0.0) *  max( dot(r,v), 0.0 ) * (k + MicroFacet * (1.0 - k));
+    if(max(dot(n,s), 0.0) > 0.0)
+    {
+        specular = (Schlicks * Geo * Beckmann) / (max(dot(n, v), 0.0) * max(dot(n,s), 0.0) * 3.14);
+    }
+
+    vec3 finalValue = Light.Ld * max(dot(n,s), 0.0) *  max( dot(r,v), 0.0 ) * (k + specular * (1.0 - k));
 
 
-   // Set the output color of our current pixel
-   //FragColor = vec4(texture(shadowMap, ShadowCoord.xy).z,0,0,1); // vec4(colorC,0,0,1);// vec4(lightColor, 1.0) * materialColor * colour;
-   FragColor =  vec4(finalValue, 1.0) * materialColor;//' * colour;
-//vec4(Noisecolor,Noisecolor,Noisecolor,1);
-   //FragColor = vec4(gl_FragCoord.z);
+    FragColor = vec4(finalValue,1.0) * materialColor;
+
+
+
+//     vec3 finalValue = Light.Ld * max(dot(n,s), 0.0) *  max( dot(r,v), 0.0 ) * (k + MicroFacet * (1.0 - k));
+
+
+//   // Set the output color of our current pixel
+//   //FragColor = vec4(texture(shadowMap, ShadowCoord.xy).z,0,0,1); // vec4(colorC,0,0,1);// vec4(lightColor, 1.0) * materialColor * colour;
+//   FragColor =  vec4(finalValue, 1.0) * materialColor * colour;
+//   //FragColor =  vec4(vec3(texture(shadowMap, WSTexCoord).x), 1.0);
+//   //FragColor = vec4(gl_FragCoord.z);
 
 
 

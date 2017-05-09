@@ -1,13 +1,13 @@
-#version 150                                      // Keeping you on the bleeding edge!
+#version 430                                     // Keeping you on the bleeding edge!
 #extension GL_EXT_gpu_shader4 : enable
-#extension GL_ARB_explicit_attrib_location : require
+//#extension GL_ARB_explicit_attrib_location : require
 #extension GL_ARB_explicit_uniform_location : require
 
 
 
 uniform sampler2D floorTex;
 uniform sampler2D shadowMap;
-uniform sampler2D depthMap;
+
 
 // Attributes passed on from the vertex shader
 smooth in vec3 WSVertexPosition;
@@ -15,6 +15,8 @@ smooth in vec3 WSVertexNormal;
 smooth in vec2 WSTexCoord;
 
 smooth in vec4 ShadowCoord;
+
+smooth in vec4 depthMVP;
 
 layout (location=0) out vec4 FragColor;
 
@@ -72,24 +74,28 @@ void main() {
             Light.Ld * Material.Kd * max( dot(s, n), 0.0 ) +
             Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ));
 
+
+    vec3 projCoords = ShadowCoord.xyz / ShadowCoord.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
     float
      bias = 0.005;
     float
      shade = 1.0;
     float
-     depth = texture(shadowMap, ShadowCoord.xy).z;
+     depth = texture(shadowMap, WSTexCoord).x;
     if
-     (depth < (ShadowCoord.z - bias)) {
+     (depth < (projCoords.x - bias)) {
     shade = 0.5;
     }
 
    vec3 shadowC = texture(shadowMap, ShadowCoord.xy).rgb;
-   float depthC = texture(depthMap, ShadowCoord.xy).z;
+
 
     vec3 texColor = texture(floorTex,WSTexCoord).rgb;
 
     // Set the output color of our current pixel
-    FragColor =  vec4(lightColor, 1.0) * vec4(texColor,1.0);
+    FragColor =  vec4( vec3(texture(shadowMap, projCoords.xy).x),1.0);
     //FragColor = vec4( depthC,0,0,1);
     //FragColor = vec4(texColor,1.0);
 }

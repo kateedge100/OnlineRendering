@@ -1,52 +1,24 @@
 // Must include our scene first because of GL dependency order
-#include "shaderscene.h"
-
-// This will probably already be included by a scene file
-#include "glinclude.h"
-#include "fixedcamera.h"
+#include "dofscene.h"
+#include "firstpersoncamera.h"
 #include "trackballcamera.h"
+#include "fixedcamera.h"
 
 // Includes for GLFW
 #include <GLFW/glfw3.h>
 
-/// A scene object
-ShaderScene g_scene;
-
-/// A camera object
-//FixedCamera g_camera;
+DofScene g_scene;
 TrackballCamera g_camera;
+GLfloat g_focalDepth = 1.0f;
 
-/******************************************************************
- * GLFW Callbacks
- * These functions are triggered on an event, such as a keypress
- * or mouse click. They need to be passed on to the relevant
- * handler, for example, the camera or scene.
- ******************************************************************/
-/**
- * @brief error_callback Function to catch GLFW errors.
- * @param error GLFW error code
- * @param description Text description
- */
 void error_callback(int error, const char* description) {
     std::cerr << "Error ("<<error<<"): " << description << "\n";
 }
 
-/**
- * @brief cursor_callback Function to catch GLFW cursor movement
- * @param xpos x position
- * @param ypos y position
- */
 void cursor_callback(GLFWwindow* /*window*/, double xpos, double ypos) {
     g_camera.handleMouseMove(xpos, ypos);
 }
 
-/**
- * @brief mouse_button_callback Handle a mouse click or release
- * @param window Window handle (unused currently)
- * @param button Which button was pressed (e.g. left or right button)
- * @param action GLFW code for the action (GLFW_PRESS or GLFW_RELEASE)
- * @param mods Other keys which are currently being held down (e.g. GLFW_CTRL)
- */
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     // Retrieve the position of the mouse click
     double xpos, ypos;
@@ -56,12 +28,34 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     g_camera.handleMouseClick(xpos, ypos, button, action, mods);
 }
 
-/**
- * @brief resize_callback Handle a window resize event.
- * @param width New window width
- * @param height New window height
- */
+void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int mods) {
+    // Escape exits the application
+    if (action == GLFW_PRESS) {
+        switch(key) {
+        case GLFW_KEY_ESCAPE: //exit the application
+            glfwSetWindowShouldClose(window, true);
+        case GLFW_KEY_LEFT_BRACKET: //decrease focal depth
+            g_focalDepth -= (g_focalDepth > 0.0f)?0.1f:0.0f;
+            g_scene.setFocalDepth(g_focalDepth);
+            break;
+        case GLFW_KEY_RIGHT_BRACKET: // increase focal depth
+            g_focalDepth += (g_focalDepth < 3.0f)?0.1f:0.0f;
+            g_scene.setFocalDepth(g_focalDepth);
+            break;
+        case GLFW_KEY_B: // toggle blur filter method
+            g_scene.toggleBlurFilter();
+            break;
+        }
+    }
+    // Any other keypress should be handled by our camera
+    g_camera.handleKey(key, (action == GLFW_PRESS) );
+}
+
+
 void resize_callback(GLFWwindow */*window*/, int width, int height) {
+    // Resize event
+    //int width, height;
+    //glfwGetFramebufferSize(window, &width, &height);
     g_camera.resize(width,height);
     g_scene.resizeGL(width,height);
 }
@@ -76,16 +70,14 @@ int main() {
     glfwSetErrorCallback(error_callback);
 
     // Set our OpenGL version
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-    glGetString(GL_VERSION);
-
     // Create our window in a platform agnostic manner
-    int width = 1024; int height = 768;
+    int width = 640; int height = 480;
     GLFWwindow* window = glfwCreateWindow(width, // width 
                                           height, // height
-                                          "Rendering Assignment", // title
+                                          "My Title", // title 
                                           nullptr, // monitor for full screen
                                           nullptr); // return value on failure
 
@@ -103,7 +95,8 @@ int main() {
     GLenum error = glGetError(); // quietly eat errors from glewInit()
 #endif
 
-
+    // Set keyboard callback
+    glfwSetKeyCallback(window, key_callback);
 
     // Disable the cursor for the FPS camera
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -123,8 +116,6 @@ int main() {
 
     // Initialise our OpenGL scene
     g_scene.initGL();
-
-    g_scene.depthMap();
 
     // Set the window resize callback and call it once
     glfwSetFramebufferSizeCallback(window, resize_callback);
