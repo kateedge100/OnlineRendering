@@ -43,7 +43,7 @@ layout (location=0) out vec4 FragColor;
 
 
 
-uniform vec2 u_resolution = vec2(768, 1024);
+uniform vec2 u_resolution = vec2(720, 1280);
 
 
 vec2 random2(vec2 st){
@@ -80,7 +80,14 @@ struct LightInfo {
 
 // We'll have a single light in the scene with some default values
 uniform LightInfo Light = LightInfo(
-            vec4(100.0, 100.0, 1.0, 1.0),   // position
+            vec4(0.0, 10.0, 0.0, 1.0),   // position
+            vec3(0.5, 0.5, 0.5),        // La
+            vec3(1.0, 1.0, 1.0),        // Ld
+            vec3(1.0, 1.0, 1.0)         // Ls
+            );
+
+uniform LightInfo Light2 = LightInfo(
+            vec4(10.0, 0.0, 0.0, 1.0),   // position
             vec3(0.5, 0.5, 0.5),        // La
             vec3(1.0, 1.0, 1.0),        // Ld
             vec3(1.0, 1.0, 1.0)         // Ls
@@ -183,6 +190,12 @@ float Schlick(vec3 v, vec3 h)
 }
 
 void main() {
+    LightInfo light[2];
+    light[0] = Light;
+    light[1] = Light2;
+
+    for (int i = 0; i < 2; i++)
+    {
 
     // Calculate the normal (this is the expensive bit in Phong)
     vec3 n = normalize( WSVertexNormal );
@@ -198,6 +211,8 @@ void main() {
         lookup = refract(v,n,refractiveIndex);
     }
 
+    vec3 finalValue;
+
     // Extract the normal from the normal map (rescale to [-1,1]
     vec3 tgt = normalize(texture(NormalTexture, WSTexCoord).rgb * 2.0 - 1.0);
 
@@ -208,7 +223,7 @@ void main() {
     vec3 np = rotateVector(src, tgt, n);
 
     // Calculate the light vector
-    vec3 s = normalize( vec3(Light.Position) - WSVertexPosition );
+    vec3 s = normalize( vec3(light[i].Position) - WSVertexPosition );
 
     // Reflect the light about the surface normal
     vec3 r = reflect( -s, np );
@@ -233,11 +248,11 @@ void main() {
    vec3 MicroFacet = vec3(Beckmann*Geo*Schlicks)/ max(dot(n,v),0.0);
 
 
-    // Compute the light from the ambient, diffuse and specular components
-    vec3 lightColor = (
-            Light.La * Material.Ka +
-            Light.Ld * Material.Kd * max( dot(s, n), 0.0 )  +
-            Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ) );
+//    // Compute the light from the ambient, diffuse and specular components
+//    vec3 lightColor = (
+//            Light.La * Material.Ka +
+//            Light.Ld * Material.Kd * max( dot(s, n), 0.0 )  +
+//            Light.Ls * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess ) );
 
 
 
@@ -252,11 +267,15 @@ void main() {
 
     Noisecolor = vec3( noise(pos)*.5+.5 ).r;
 
+
+
+
     // Determine the gloss value from our input texture, and scale it by our LOD resolution
     float gloss = (1.0 - Noisecolor) * float(envMaxLOD);
 
     // This call determines the current LOD value for the texture map
     vec4 colour = textureLod(envMap, lookup, gloss);
+
 
 
     // calculate shadows
@@ -288,10 +307,12 @@ void main() {
         specular = (Schlicks * Geo * Beckmann) / (max(dot(n, v), 0.0) * max(dot(n,s), 0.0) * 3.14);
     }
 
-    vec3 finalValue = Light.Ld * max(dot(n,s), 0.0) *  max( dot(r,v), 0.0 ) * (k + specular * (1.0 - k));
+    finalValue += light[i].Ld * max(dot(n,s), 0.0) *  max( dot(r,v), 0.0 ) * (k + specular * (1.0 - k));
 
 
-    FragColor = vec4(finalValue,1.0) * materialColor;
+    FragColor = vec4(finalValue,1.0)  * materialColor * colour;
+
+    }
 
 
 

@@ -79,7 +79,7 @@ void DofScene::initGL() noexcept {
     // Initialise our gloss texture map here
     initTexture(5, m_glossMapTex, "images/gloss.png");
     // Initialise our foor textur here
-    initTexture(6, m_floorTex, "images/floor.jpg");
+    initTexture(6, m_floorTex, "images/woodTexture.jpg");
 
     // Initialise our environment map here at texture unit 0
     initEnvironment();
@@ -403,30 +403,30 @@ glViewport(0,0,m_width,m_height);
     // SHADOW MAP PASS
 // ----------------------------------------------------------------------------------------
 
-        // Bind the FBO to specify an alternative render target
-        glBindFramebuffer(GL_FRAMEBUFFER, m_fboId);
+//        // Bind the FBO to specify an alternative render target
+//        glBindFramebuffer(GL_FRAMEBUFFER, m_fboId);
 
-        // Set up the viewport
-        glViewport(0,0,m_width,m_height);
+//        // Set up the viewport
+//        glViewport(0,0,m_width,m_height);
 
-        // Clear the screen (fill with our glClearColor)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//        // Clear the screen (fill with our glClearColor)
+//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // SHADOW MAP PASS
-        drawScene("shadow");
+//        // SHADOW MAP PASS
+//        drawScene("shadow");
 
 
 
-        // Unbind our FBO
-       glBindFramebuffer(GL_FRAMEBUFFER,0);
+//        // Unbind our FBO
+//       glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-        // Find the depth of field shader
-        glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glViewport(0,0,m_width,m_height);
+//        // Find the depth of field shader
+//        glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//        glViewport(0,0,m_width,m_height);
 
-        // Now bind our rendered image which should be in the frame buffer for the next render pass
-        glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, m_fboDepthId);
+//        // Now bind our rendered image which should be in the frame buffer for the next render pass
+//        glActiveTexture(GL_TEXTURE7);
+//        glBindTexture(GL_TEXTURE_2D, m_fboDepthId);
 
 
 
@@ -436,7 +436,7 @@ glViewport(0,0,m_width,m_height);
     // DEPTH MAP PASS
 //------------------------------------------------------------------------------------------
     // Bind the FBO to specify an alternative render target
-   // glBindFramebuffer(GL_FRAMEBUFFER, m_fboId);
+    //glBindFramebuffer(GL_FRAMEBUFFER, m_fboId);
 
      //Set up the viewport
     glViewport(0,0,m_width,m_height);

@@ -45,8 +45,8 @@ struct LightInfo {
 
 // We'll have a single light in the scene with some default values
 uniform LightInfo Light = LightInfo(
-            vec4(100.0,100.0, 100.0, 1.0),   // position
-            vec3(0.2, 0.2, 0.2),        // La
+            vec4(-100.0,100.0, 0.0, 1.0),   // position
+            vec3(0.4, 0.4, 0.4),        // La
             vec3(1.0, 1.0, 1.0),        // Ld
             vec3(1.0, 1.0, 1.0)         // Ls
             );

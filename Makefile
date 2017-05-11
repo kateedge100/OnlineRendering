@@ -69,6 +69,7 @@ DIST          = shaders/dof_frag.glsl \
 		shaders/shadow_vert.glsl \
 		shaders/shadow_frag.glsl \
 		model/memoryStickPlastic.obj \
+		images/env_top.png \
 		.qmake.stash \
 		memoryStick.pro ../common/include/scene.h \
 		../common/include/camera.h \

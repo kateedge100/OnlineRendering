@@ -93,7 +93,7 @@ void main() {
     vec3 texColor = texture(floorTex,WSTexCoord).rgb;
 
     // Set the output color of our current pixel
-    FragColor =  vec4(vec3(texture(shadowMap, shadowUV.xy)),1.0);
+    //FragColor =  vec4(vec3(texture(shadowMap, shadowUV.xy)),1.0);
     //FragColor = vec4( depthC,0,0,1);
-    //FragColor = vec4(texColor,1.0);
+    FragColor = vec4(texColor,1.0);
 }

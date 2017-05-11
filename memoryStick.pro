@@ -32,6 +32,7 @@ DISTFILES += \
                shaders/shadow_vert.glsl \
                shaders/shadow_frag.glsl \
              model/memoryStickPlastic.obj \
+             images/env_top.png \
 
 	
 	
